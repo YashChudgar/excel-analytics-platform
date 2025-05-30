@@ -8,22 +8,16 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/auth/login', { email, password });
-      return response.data;
-    } catch (err) {
-      return rejectWithValue(err.response.data.error || 'Login failed');
-    }
-  }
-);
 
-// Fetch profile thunk (protected)
-export const fetchUserProfile = createAsyncThunk(
-  'auth/fetchUserProfile',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get('/auth/profile');
+      // Check backend response structure
+      if (!response.data.success) {
+        return rejectWithValue(response.data.message || 'Login failed');
+      }
+
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data.error || 'Fetching profile failed');
+      const message = err?.response?.data?.message || err?.message || 'Login failed';
+      return rejectWithValue(message);
     }
   }
 );
