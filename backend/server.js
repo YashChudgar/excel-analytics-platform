@@ -5,16 +5,31 @@ require('dotenv').config();
 
 const path = require("path");
 const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const uploadRoutes = require("./routes/uploadRoutes");
-
+const userRoutes = require("./routes/user");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Create uploads directory if it doesn't exist
+const fs = require("fs");
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+// Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.error("MONGODB_URI is not defined in environment variables");
+  process.exit(1);
+}
 
 mongoose.set('strictQuery', false);
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -23,6 +38,9 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 app.use('/api/auth', authRoutes);
 app.use("/api", uploadRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something went wrong!" });

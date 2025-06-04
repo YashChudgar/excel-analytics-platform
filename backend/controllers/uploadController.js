@@ -1,36 +1,59 @@
-const path = require("path");
+const UserFile = require("../models/UserFile");
+const cloudinary = require("../config/cloudinary");
+const { createActivity } = require("./userActivityController");
 const fs = require("fs");
-const Upload = require("../models/Upload"); // Make sure this path is correct
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, "../uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
-
-exports.uploadFile = async (req, res) => {
+const uploadFile = async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // Create an Upload document and associate it with the logged-in user
-    const upload = new Upload({
-      filename: req.file.filename,
-      path: req.file.path,
-      user: req.user._id, // assuming auth middleware sets req.user
+    const { path: localFilePath, originalname } = req.file;
+
+    // Upload the file to Cloudinary as raw file
+    const result = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "raw",
+      folder: "excel-files",
+      public_id: `${Date.now()}-${originalname.split('.')[0]}`,
     });
 
-    await upload.save();
+    // Remove file from local uploads folder after upload
+    fs.unlink(localFilePath, (err) => {
+      if (err) console.error("Failed to delete local file:", err);
+    });
+
+    // Save file info in database
+    const newFile = new UserFile({
+      user: req.user._id,
+      originalName: originalname,
+      filename: result.public_id, // Cloudinary public ID
+      mimetype: req.file.mimetype,
+      cloudinaryUrl: result.secure_url,
+      cloudinaryId: result.public_id,
+      size: req.file.size,
+    });
+
+    await newFile.save();
+
+    // Log activity
+    await createActivity(
+      req.user._id,
+      "upload",
+      `Uploaded file: ${originalname}`,
+      newFile._id
+    );
 
     res.status(200).json({
-      message: "File uploaded and saved to DB",
-      upload,
+      message: "File uploaded successfully to Cloudinary",
+      upload: newFile,
     });
   } catch (error) {
-    console.error("Upload error:", error);
-    res
-      .status(500)
-      .json({ message: "Error uploading file", error: error.message });
+    console.error("File upload error:", error);
+    res.status(500).json({ error: "File upload failed" });
   }
+};
+
+module.exports = {
+  uploadFile,
 };
