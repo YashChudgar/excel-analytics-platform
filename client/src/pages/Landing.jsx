@@ -1,22 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Grid,
-  Card,
-  CardContent,
-  useTheme,
-  Avatar,
-  Rating,
-  TextField,
-  InputAdornment,
-  IconButton,
-} from "@mui/material";
-import { motion } from "framer-motion";
-import {
   BarChart,
   Psychology,
   Link as LinkIcon,
@@ -31,739 +15,269 @@ import {
   TableChart,
   Dashboard,
   Share,
-  PlayCircle,
-  LinkedIn,
-  Twitter,
-  YouTube,
-  Send,
 } from "@mui/icons-material";
+import { Avatar, Rating } from "@mui/material";
+import { motion } from "framer-motion";
 import Footer from "../components/Footer";
 
-const features = [
-  {
-    icon: <BarChart sx={{ fontSize: 40 }} />,
-    title: "Real-time Visualization",
-    description:
-      "Turn spreadsheets into dashboards in seconds with dynamic updates and interactive elements.",
-  },
-  {
-    icon: <Psychology sx={{ fontSize: 40 }} />,
-    title: "Smart Insights",
-    description:
-      "Discover trends and patterns with built-in AI-powered analytics and recommendations.",
-  },
-  {
-    icon: <LinkIcon sx={{ fontSize: 40 }} />,
-    title: "Seamless Integration",
-    description:
-      "Works seamlessly with Excel, Google Sheets, and OneDrive for a unified experience.",
-  },
-  {
-    icon: <Group sx={{ fontSize: 40 }} />,
-    title: "Collaborative",
-    description:
-      "Share insights securely with teams and clients with granular permission controls.",
-  },
-  {
-    icon: <CodeOff sx={{ fontSize: 40 }} />,
-    title: "No-Code Interface",
-    description:
-      "Designed for everyone, not just data experts. Start analyzing data in minutes.",
-  },
-];
-
-const useCases = [
-  {
-    icon: <BusinessCenter sx={{ fontSize: 40 }} />,
-    title: "Business Analysts",
-    description:
-      "Rapid reporting and visual exploration of complex data sets with interactive dashboards.",
-  },
-  {
-    icon: <Assignment sx={{ fontSize: 40 }} />,
-    title: "Project Managers",
-    description:
-      "Monitor KPIs and progress in real-time with automated project dashboards.",
-  },
-  {
-    icon: <AccountBalance sx={{ fontSize: 40 }} />,
-    title: "Accountants",
-    description:
-      "Create automated financial dashboards and streamline reporting processes.",
-  },
-  {
-    icon: <Campaign sx={{ fontSize: 40 }} />,
-    title: "Marketing Teams",
-    description:
-      "Track campaign performance and visualize marketing metrics across channels.",
-  },
-  {
-    icon: <School sx={{ fontSize: 40 }} />,
-    title: "Educators",
-    description:
-      "Present and explain data clearly in class with interactive visualizations.",
-  },
-];
-
-const steps = [
-  {
-    icon: <Upload sx={{ fontSize: 40 }} />,
-    title: "Connect Your Data",
-    description:
-      "Upload your Excel file or connect to cloud storage platforms.",
-    number: "01",
-  },
-  {
-    icon: <TableChart sx={{ fontSize: 40 }} />,
-    title: "Select Data Range",
-    description:
-      "Choose the specific data ranges or sheets you want to analyze.",
-    number: "02",
-  },
-  {
-    icon: <Dashboard sx={{ fontSize: 40 }} />,
-    title: "Generate Dashboards",
-    description:
-      "Let our AI create beautiful, interactive dashboards instantly.",
-    number: "03",
-  },
-  {
-    icon: <Share sx={{ fontSize: 40 }} />,
-    title: "Share & Export",
-    description:
-      "Share with team members or export in various formats with one click.",
-    number: "04",
-  },
-];
-
-const testimonials = [
-  {
-    name: "Sarah Johnson",
-    role: "Business Analyst",
-    company: "TechCorp",
-    rating: 5,
-    comment:
-      "Excellytics has transformed how we handle data. The AI insights are incredibly accurate and save us hours of analysis.",
-    avatar: "/images/avatar1.jpg",
-  },
-  {
-    name: "Michael Chen",
-    role: "Project Manager",
-    company: "Innovate Inc",
-    rating: 5,
-    comment:
-      "The real-time dashboards have revolutionized our project tracking. Our stakeholders love the visual reports.",
-    avatar: "/images/avatar2.jpg",
-  },
-  {
-    name: "Emily Rodriguez",
-    role: "Marketing Director",
-    company: "Growth Marketing",
-    rating: 5,
-    comment:
-      "Finally, a tool that makes data visualization accessible to everyone. The integration with our existing tools is seamless.",
-    avatar: "/images/avatar3.jpg",
-  },
-];
 
 const Landing = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState("");
 
-  const handleNewsletterSubmit = (e) => {
-    e.preventDefault();
-    // Handle newsletter signup
-    console.log("Newsletter signup:", email);
-    setEmail("");
-  };
+  const features = [
+    {
+      icon: <BarChart fontSize="large" />, title: "Real-time Visualization", description: "Turn spreadsheets into dashboards in seconds with dynamic updates and interactive elements."
+    },
+    {
+      icon: <Psychology fontSize="large" />, title: "Smart Insights", description: "Discover trends and patterns with built-in AI-powered analytics and recommendations."
+    },
+    {
+      icon: <LinkIcon fontSize="large" />, title: "Seamless Integration", description: "Works seamlessly with Excel, Google Sheets, and OneDrive for a unified experience."
+    },
+    {
+      icon: <Group fontSize="large" />, title: "Collaborative", description: "Share insights securely with teams and clients with granular permission controls."
+    },
+    {
+      icon: <CodeOff fontSize="large" />, title: "No-Code Interface", description: "Designed for everyone, not just data experts. Start analyzing data in minutes."
+    },
+  ];
+
+  const useCases = [
+    { icon: <BusinessCenter fontSize="large" />, title: "Business Analysts", description: "Rapid reporting and visual exploration of complex data sets with interactive dashboards." },
+    { icon: <Assignment fontSize="large" />, title: "Project Managers", description: "Monitor KPIs and progress in real-time with automated project dashboards." },
+    { icon: <AccountBalance fontSize="large" />, title: "Accountants", description: "Create automated financial dashboards and streamline reporting processes." },
+    { icon: <Campaign fontSize="large" />, title: "Marketing Teams", description: "Track campaign performance and visualize marketing metrics across channels." },
+    { icon: <School fontSize="large" />, title: "Educators", description: "Present and explain data clearly in class with interactive visualizations." },
+  ];
+
+  const steps = [
+    { icon: <Upload fontSize="large" />, title: "Connect Your Data", description: "Upload your Excel file or connect to cloud storage platforms.", number: "01" },
+    { icon: <TableChart fontSize="large" />, title: "Select Data Range", description: "Choose the specific data ranges or sheets you want to analyze.", number: "02" },
+    { icon: <Dashboard fontSize="large" />, title: "Generate Dashboards", description: "Let our AI create beautiful, interactive dashboards instantly.", number: "03" },
+    { icon: <Share fontSize="large" />, title: "Share & Export", description: "Share with team members or export in various formats with one click.", number: "04" },
+  ];
+
+  const testimonials = [
+    { name: "Sarah Johnson", role: "Business Analyst", company: "TechCorp", rating: 5, comment: "Excellytics has transformed how we handle data. The AI insights are incredibly accurate and save us hours of analysis.", avatar: "/images/avatar1.jpg" },
+    { name: "Michael Chen", role: "Project Manager", company: "Innovate Inc", rating: 5, comment: "The real-time dashboards have revolutionized our project tracking. Our stakeholders love the visual reports.", avatar: "/images/avatar2.jpg" },
+    { name: "Emily Rodriguez", role: "Marketing Director", company: "Growth Marketing", rating: 5, comment: "Finally, a tool that makes data visualization accessible to everyone. The integration with our existing tools is seamless.", avatar: "/images/avatar3.jpg" },
+  ];
 
   return (
-    <Box>
-      {/* Hero Section */}
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-          position: "relative",
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'url("/images/analytics-bg.jpg")',
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            opacity: 0.1,
-            zIndex: 0,
-          },
-        }}
-      >
-        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Typography
-                  variant="h1"
-                  sx={{
-                    fontSize: { xs: "2.5rem", md: "3.5rem" },
-                    fontWeight: 800,
-                    mb: 2,
-                    background:
-                      "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  Transform Your Excel Sheets into Smart Dashboards
-                </Typography>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    color: "text.secondary",
-                    mb: 4,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  No-code analytics platform to visualize, analyze, and share
-                  insights directly from Excel in seconds.
-                </Typography>
-                <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                  <Button
-                    component={motion.button}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    variant="contained"
-                    size="large"
-                    onClick={() => navigate("/register")}
-                    sx={{
-                      py: 2,
-                      px: 4,
-                      fontSize: "1.1rem",
-                      borderRadius: "12px",
-                      background:
-                        "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-                      "&:hover": {
-                        background:
-                          "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
-                      },
-                    }}
-                  >
-                    Get Started
-                  </Button>
-                </Box>
-              </motion.div>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <Box
-                  component="img"
-                  src="/images/analytics-dashboard.png"
-                  alt="Analytics Dashboard"
-                  sx={{
-                    width: "100%",
-                    height: "auto",
-                    borderRadius: "20px",
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-                  }}
-                />
-              </motion.div>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
+    <>
+     <div className="relative min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 overflow-hidden flex items-center">
+      {/* Background Image Overlay */}
+      <div className="absolute inset-0">
+        <img
+          src="/images/analytics-bg.jpg"
+          alt="Background"
+          className="w-full h-full object-cover opacity-10"
+        />
+      </div>
 
-      {/* Features Section */}
-      <Box
-        id="features"
-        sx={{
-          py: 8,
-          backgroundColor: (theme) => theme.palette.grey[50],
-        }}
-      >
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            align="center"
-            sx={{
-              mb: 6,
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Why Excellytics?
-          </Typography>
-          <Grid container spacing={4}>
-            {features.map((feature, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card
-                    sx={{
-                      height: "100%",
-                      borderRadius: "16px",
-                      transition: "transform 0.2s",
-                      display: "flex",
-                      flexDirection: "column",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                      },
-                    }}
-                  >
-                    <CardContent
-                      sx={{
-                        p: 4,
-                        flexGrow: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          color: "primary.main",
-                          mb: 2,
-                          height: 48,
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        {feature.icon}
-                      </Box>
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: 600,
-                          mb: 2,
-                          minHeight: "2.5em",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        {feature.title}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        sx={{
-                          lineHeight: 1.6,
-                          flexGrow: 1,
-                          minHeight: "4.8em",
-                        }}
-                      >
-                        {feature.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* Use Cases Section */}
-      <Box
-        id="use-cases"
-        sx={{
-          py: 8,
-          backgroundColor: "white",
-        }}
-      >
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            align="center"
-            sx={{
-              mb: 6,
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Use Cases
-          </Typography>
-          <Grid container spacing={4}>
-            {useCases.map((useCase, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card
-                    sx={{
-                      height: "100%",
-                      borderRadius: "16px",
-                      transition: "all 0.3s ease",
-                      background:
-                        "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                  >
-                    <CardContent
-                      sx={{
-                        p: 4,
-                        flexGrow: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          color: "primary.main",
-                          mb: 2,
-                          height: 48,
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        {useCase.icon}
-                      </Box>
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: 600,
-                          mb: 2,
-                          minHeight: "2.5em",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        {useCase.title}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        sx={{
-                          lineHeight: 1.6,
-                          flexGrow: 1,
-                          minHeight: "4.8em",
-                        }}
-                      >
-                        {useCase.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* How It Works Section */}
-      <Box
-        id="how-it-works"
-        sx={{
-          py: 8,
-          backgroundColor: (theme) => theme.palette.grey[50],
-        }}
-      >
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            align="center"
-            sx={{
-              mb: 6,
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            How It Works
-          </Typography>
-          <Grid container spacing={4}>
-            {steps.map((step, index) => (
-              <Grid item xs={12} md={3} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card
-                    sx={{
-                      height: "100%",
-                      borderRadius: "16px",
-                      position: "relative",
-                      overflow: "visible",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: -20,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        width: 40,
-                        height: 40,
-                        borderRadius: "50%",
-                        background:
-                          "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-                        color: "white",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: 700,
-                        fontSize: "1.2rem",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      {step.number}
-                    </Box>
-                    <CardContent
-                      sx={{
-                        p: 4,
-                        pt: 6,
-                        flexGrow: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          color: "primary.main",
-                          mb: 2,
-                          height: 48,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {step.icon}
-                      </Box>
-                      <Typography
-                        variant="h5"
-                        align="center"
-                        sx={{
-                          fontWeight: 600,
-                          mb: 2,
-                          minHeight: "2.5em",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {step.title}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        align="center"
-                        sx={{
-                          lineHeight: 1.6,
-                          flexGrow: 1,
-                          minHeight: "4.8em",
-                        }}
-                      >
-                        {step.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* Testimonials Section */}
-      <Box
-        sx={{
-          py: 8,
-          backgroundColor: (theme) => theme.palette.grey[50],
-        }}
-      >
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            align="center"
-            sx={{
-              mb: 6,
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Trusted by Teams and Professionals Worldwide
-          </Typography>
-          <Grid container spacing={4}>
-            {testimonials.map((testimonial, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card
-                    sx={{
-                      height: "100%",
-                      borderRadius: "16px",
-                      transition: "all 0.3s ease",
-                      display: "flex",
-                      flexDirection: "column",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                  >
-                    <CardContent
-                      sx={{
-                        p: 4,
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      <Box sx={{ mb: 3 }}>
-                        <Rating value={testimonial.rating} readOnly />
-                      </Box>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          mb: 3,
-                          fontStyle: "italic",
-                          lineHeight: 1.6,
-                          flexGrow: 1,
-                          minHeight: "4.8em",
-                        }}
-                      >
-                        "{testimonial.comment}"
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 2,
-                          mt: "auto",
-                        }}
-                      >
-                        <Avatar
-                          src={testimonial.avatar}
-                          alt={testimonial.name}
-                          sx={{ width: 48, height: 48 }}
-                        />
-                        <Box>
-                          <Typography variant="subtitle1" fontWeight={600}>
-                            {testimonial.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {testimonial.role} at {testimonial.company}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* CTA Section */}
-      <Box
-        id="contact"
-        sx={{
-          py: 8,
-          backgroundColor: "white",
-        }}
-      >
-        <Container maxWidth="md">
+      {/* Content Container */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          {/* Text Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
           >
-            <Typography
-              variant="h3"
-              align="center"
-              sx={{
-                fontWeight: 700,
-                mb: 3,
-              }}
-            >
-              Ready to Unlock the Power of Excel?
-            </Typography>
-            <Typography
-              variant="h6"
-              align="center"
-              sx={{
-                mb: 4,
-                opacity: 0.9,
-                lineHeight: 1.6,
-              }}
-            >
-              Join teams transforming spreadsheets into business intelligence
-              dashboards.
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                justifyContent: "center",
-                flexWrap: "wrap",
-              }}
-            >
-              <Button
-                component={motion.button}
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
+              Transform Your Excel Sheets into Smart Dashboards
+            </h1>
+            <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+              No-code analytics platform to visualize, analyze, and share insights directly from Excel in seconds.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                variant="contained"
-                size="large"
                 onClick={() => navigate("/register")}
-                sx={{
-                  py: 2,
-                  px: 6,
-                  fontSize: "1.1rem",
-                  borderRadius: "12px",
-                  background:
-                    "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-                  "&:hover": {
-                    background:
-                      "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
-                  },
-                }}
+                className="py-3 px-6 text-lg rounded-xl font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-900 hover:from-indigo-900 hover:to-indigo-600 transition"
               >
-                Sign Up Now
-              </Button>
-            </Box>
+                Get Started
+              </motion.button>
+            </div>
           </motion.div>
-        </Container>
-      </Box>
 
-      <Footer />
-    </Box>
+          {/* Image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <img
+              src="/images/analytics-dashboard.png"
+              alt="Analytics Dashboard"
+              className="w-full h-auto rounded-3xl shadow-2xl"
+            />
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+     {/* Features Section */}
+      <section id="features" className="py-20 bg-gray-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
+            Why Excellytics?
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-2 p-6 flex flex-col justify-between h-full"
+              >
+                <div className="text-indigo-600 mb-4 h-12 flex items-center">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-semibold mb-2 min-h-[2.5em]">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 flex-grow min-h-[4.8em]">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Use Cases Section */}
+      <section id="use-cases" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
+            Use Cases
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+            {useCases.map((useCase, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 shadow-md hover:shadow-xl transform transition-transform hover:-translate-y-2 h-full flex flex-col"
+              >
+                <div className="text-indigo-600 mb-4 h-12 flex items-center">
+                  {useCase.icon}
+                </div>
+                <h3 className="text-xl font-semibold mb-2 min-h-[2.5em] flex items-center">
+                  {useCase.title}
+                </h3>
+                <p className="text-gray-600 flex-grow leading-relaxed min-h-[4.8em]">
+                  {useCase.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
+            How It Works
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {steps.map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative bg-white p-6 pt-10 rounded-2xl shadow hover:shadow-lg transition-all h-full flex flex-col items-center text-center"
+              >
+                <div className="absolute -top-5 w-10 h-10 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-900 text-white flex items-center justify-center font-bold text-lg shadow">
+                  {step.number}
+                </div>
+                <div className="text-indigo-600 mb-4 h-12 flex items-center justify-center">
+                  {step.icon}
+                </div>
+                <h3 className="text-lg font-semibold mb-2 min-h-[2.5em]">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600 min-h-[4.8em]">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+     {/* Testimonials Section */}
+        <div className="py-20 bg-gray-100">
+          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
+            Trusted by Teams and Professionals Worldwide
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+              >
+                <div className="mb-4">
+                  <Rating value={testimonial.rating} readOnly />
+                </div>
+                <p className="italic text-gray-700 flex-grow mb-6">
+                  "{testimonial.comment}"
+                </p>
+                <div className="flex items-center gap-4 mt-auto">
+                  <Avatar src={testimonial.avatar} alt={testimonial.name} sx={{ width: 48, height: 48 }} />
+                  <div>
+                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500">{testimonial.role} at {testimonial.company}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+     {/* CTA Section */}
+<div id="contact" className="py-20 bg-white">
+  <div className="max-w-2xl mx-auto px-6 text-center">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+    >
+      <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+        Ready to Unlock the Power of Excel?
+      </h2>
+      <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+        Join teams transforming spreadsheets into business intelligence dashboards.
+      </p>
+      <div className="flex flex-wrap justify-center gap-4">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/register")}
+          className="py-3 px-8 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-indigo-900 hover:from-indigo-900 hover:to-indigo-600 transition"
+        >
+          Sign Up Now
+        </motion.button>
+      </div>
+    </motion.div>
+  </div>
+</div>
+<Footer />
+</>
   );
 };
 

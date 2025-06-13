@@ -1,36 +1,11 @@
+// Converted from MUI to Tailwind CSS with same content, improved layout and animations
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { logout as reduxLogout } from "../features/auth/authSlice"; // Adjust path if needed
+import { logout as reduxLogout } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { format } from "date-fns";
-
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Grid,
-  Button,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Card,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  CircularProgress,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import BarChartIcon from "@mui/icons-material/BarChart";
@@ -44,7 +19,6 @@ const Dashboard = () => {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
 
-  // State for user activities and files
   const [activities, setActivities] = useState([]);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,24 +28,35 @@ const Dashboard = () => {
   useEffect(() => {
     fetchActivities();
     fetchFiles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activityLimit]);
 
   const fetchActivities = async () => {
-    try {
-      const response = await axios.get(
-        `/api/user/activities?limit=${activityLimit}`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-      setActivities(response.data);
-      setError("");
-    } catch (error) {
-      console.error("Error fetching activities:", error);
-      setError("Error fetching activities");
+  try {
+    const response = await axios.get(
+      `/api/user/activities?limit=${activityLimit}`,
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }
+    );
+    const data = response.data;
+    // Log to debug structure
+    console.log("Activities response:", data);
+
+    // Assume it may return { activities: [...] } or just [...]
+    if (Array.isArray(data)) {
+      setActivities(data);
+    } else if (Array.isArray(data.activities)) {
+      setActivities(data.activities);
+    } else {
+      setActivities([]);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+    setError("Error fetching activities");
+    setActivities([]);
+  }
+};
+
 
   const fetchFiles = async () => {
     try {
@@ -79,9 +64,7 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setFiles(response.data);
-      setError("");
     } catch (error) {
-      console.error("Error fetching files:", error);
       setError("Error fetching files");
     } finally {
       setLoading(false);
@@ -95,9 +78,7 @@ const Dashboard = () => {
       });
       fetchFiles();
       fetchActivities();
-      setError("");
-    } catch (error) {
-      console.error("Error deleting file:", error);
+    } catch {
       setError("Error deleting file");
     }
   };
@@ -106,256 +87,174 @@ const Dashboard = () => {
     navigate(`/excel-analytics?fileId=${fileId}`);
   };
 
-  const getActivityIcon = (type) => {
-    switch (type) {
-      case "login":
-        return <Box sx={{ display: "flex", alignItems: "center" }}>🔐</Box>;
-      case "upload":
-        return (
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <CloudUploadIcon sx={{ fontSize: 18 }} />
-          </Box>
-        );
-      case "analyze":
-        return (
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <AnalyticsIcon sx={{ fontSize: 18 }} />
-          </Box>
-        );
-      case "delete":
-        return <Box sx={{ display: "flex", alignItems: "center" }}>🗑️</Box>;
-      default:
-        return <Box sx={{ display: "flex", alignItems: "center" }}>📝</Box>;
-    }
-  };
-
-  const handleActivityLimitChange = (event) => {
-    setActivityLimit(event.target.value);
-  };
-
-  const handleLogout = () => {
-    dispatch(reduxLogout());
-    navigate("/login");
-  };
-
   const features = [
     {
       title: "Excel Analytics",
       description: "Upload and analyze your Excel files with advanced analytics tools",
-      icon: <TableChartIcon sx={{ fontSize: 60, color: "#4f46e5", mb: 2 }} />,
+      icon: <TableChartIcon className="text-indigo-600 w-12 h-12 mb-2" />,
       onClick: () => navigate("/excel-analytics"),
     },
     {
       title: "Data Analysis",
       description: "Analyze your Excel data with powerful tools",
-      icon: <AnalyticsIcon sx={{ fontSize: 40 }} />,
+      icon: <AnalyticsIcon className="w-10 h-10" />,
     },
     {
       title: "Visualizations",
       description: "Create beautiful charts and graphs",
-      icon: <BarChartIcon sx={{ fontSize: 40 }} />,
+      icon: <BarChartIcon className="w-10 h-10" />,
     },
   ];
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      {/* AppBar + Logout */}
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-indigo-700 text-white shadow-md">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-2">
             <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Excel Analytics Platform
-          </Typography>
-          <Button color="inherit" onClick={handleLogout}>
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        {/* Welcome + Features Section */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Paper
-            sx={{
-              p: 3,
-              display: "flex",
-              flexDirection: "column",
-              background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-              color: "white",
+            <h1 className="text-xl font-semibold">Excel Analytics Platform</h1>
+          </div>
+          <button
+            onClick={() => {
+              dispatch(reduxLogout());
+              navigate("/login");
             }}
-            component={motion.div}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            className="bg-white text-indigo-700 px-4 py-1 rounded hover:bg-gray-100"
           >
-            <Typography variant="h4" gutterBottom>
-              Welcome back, {user?.username}!
-            </Typography>
-            <Typography variant="subtitle1">
-              Here's an overview of your analytics and activities
-            </Typography>
-          </Paper>
+            Logout
+          </button>
+        </div>
+      </header>
 
-          <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 2 }}>
-            Features
-          </Typography>
-
-          <Grid container spacing={3}>
-            {features.map((feature, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card
-                    sx={{
-                      height: "100%",
-                      cursor: feature.onClick ? "pointer" : "default",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      textAlign: "center",
-                      p: 3,
-                    }}
-                    onClick={feature.onClick}
-                    component={feature.onClick ? "button" : "div"}
-                  >
-                    {feature.icon}
-                    <Typography variant="h6" component="h2" gutterBottom>
-                      {feature.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {feature.description}
-                    </Typography>
-                  </Card>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
+      <main className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-6 rounded-xl shadow-lg"
+        >
+          <h2 className="text-3xl font-bold mb-2">Welcome back, {user?.username}!</h2>
+          <p className="text-lg">Here's an overview of your analytics and activities</p>
         </motion.div>
 
-        {/* Activities Section */}
-        <Grid item xs={12} sx={{ mt: 6 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-            <Typography variant="h5">Recent Activities</Typography>
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel id="activity-limit-label">Show</InputLabel>
-              <Select
-                labelId="activity-limit-label"
-                id="activity-limit"
-                value={activityLimit}
-                label="Show"
-                onChange={handleActivityLimitChange}
-                size="small"
-              >
-                <MenuItem value={5}>Last 5</MenuItem>
-                <MenuItem value={10}>Last 10</MenuItem>
-                <MenuItem value={20}>Last 20</MenuItem>
-                <MenuItem value={50}>Last 50</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Date</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {activities.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={3} align="center">
-                      No activities found.
-                    </TableCell>
-                  </TableRow>
-                )}
-                {activities.map((activity) => (
-                  <TableRow key={activity._id}>
-                    <TableCell>
-                      <Chip
-                        icon={<span>{getActivityIcon(activity.type)}</span>}
-                        label={activity.type}
-                        color="primary"
-                        variant="outlined"
-                      />
-                    </TableCell>
-                    <TableCell>{activity.description}</TableCell>
-                    <TableCell>{format(new Date(activity.createdAt), "MMM d, yyyy h:mm a")}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
+        <h3 className="text-2xl font-semibold mt-10 mb-4">Features</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={`p-6 bg-white rounded-lg shadow-md flex flex-col items-center text-center hover:shadow-xl transition duration-300 ${feature.onClick ? 'cursor-pointer' : ''}`}
+              onClick={feature.onClick}
+            >
+              {feature.icon}
+              <h4 className="text-lg font-bold mt-2">{feature.title}</h4>
+              <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
+            </motion.div>
+          ))}
+        </div>
 
-        {/* Files Section */}
-        <Grid item xs={12} sx={{ mt: 6 }}>
-          <Typography variant="h5" gutterBottom>
-            Your Files
-          </Typography>
+        <section className="mt-10">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold">Recent Activities</h3>
+            <select
+              value={activityLimit}
+              onChange={(e) => setActivityLimit(e.target.value)}
+              className="border rounded px-3 py-1"
+            >
+              {[5, 10, 20, 50].map((num) => (
+                <option key={num} value={num}>
+                  Last {num}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="overflow-x-auto bg-white rounded shadow">
+            <table className="w-full text-left">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="p-3">Type</th>
+                  <th className="p-3">Description</th>
+                  <th className="p-3">Date</th>
+                </tr>
+              </thead>
+                <tbody>
+  {!Array.isArray(activities) || activities.length === 0 ? (
+    <tr>
+      <td colSpan="3" className="text-center p-4">
+        No activities found.
+      </td>
+    </tr>
+  ) : (
+    activities.map((activity) => (
+      <tr key={activity._id} className="hover:bg-gray-50">
+        <td className="p-3 flex items-center gap-2">{activity.type}</td>
+        <td className="p-3">{activity.description}</td>
+        <td className="p-3">
+          {format(new Date(activity.createdAt), "MMM d, yyyy h:mm a")}
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="mt-10">
+          <h3 className="text-xl font-semibold mb-4">Your Files</h3>
           {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-              <CircularProgress />
-            </Box>
+            <div className="flex justify-center p-4">
+              <div className="loader">Loading...</div>
+            </div>
           ) : error ? (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
+            <div className="bg-red-100 text-red-700 p-3 rounded">{error}</div>
           ) : files.length === 0 ? (
-            <Typography>No files uploaded yet.</Typography>
+            <p>No files uploaded yet.</p>
           ) : (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>File Name</TableCell>
-                    <TableCell>Size</TableCell>
-                    <TableCell>Upload Date</TableCell>
-                    <TableCell>Last Analyzed</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
+            <div className="overflow-x-auto bg-white rounded shadow">
+              <table className="w-full text-left">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-3">File Name</th>
+                    <th className="p-3">Size</th>
+                    <th className="p-3">Upload Date</th>
+                    <th className="p-3">Last Analyzed</th>
+                    <th className="p-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {files.map((file) => (
-                    <TableRow key={file._id}>
-                      <TableCell>{file.originalName}</TableCell>
-                      <TableCell>{(file.size / 1024 / 1024).toFixed(2)} MB</TableCell>
-                      <TableCell>{format(new Date(file.createdAt), "MMM d, yyyy h:mm a")}</TableCell>
-                      <TableCell>
-                        {file.lastAnalyzed ? format(new Date(file.lastAnalyzed), "MMM d, yyyy h:mm a") : "Never"}
-                      </TableCell>
-                      <TableCell>
-                        <IconButton
-                          color="primary"
+                    <tr key={file._id} className="hover:bg-gray-50">
+                      <td className="p-3">{file.originalName}</td>
+                      <td className="p-3">{(file.size / 1024 / 1024).toFixed(2)} MB</td>
+                      <td className="p-3">{format(new Date(file.createdAt), "MMM d, yyyy h:mm a")}</td>
+                      <td className="p-3">{file.lastAnalyzed ? format(new Date(file.lastAnalyzed), "MMM d, yyyy h:mm a") : "Never"}</td>
+                      <td className="p-3 flex gap-2">
+                        <button
                           onClick={() => handleAnalyzeFile(file._id)}
-                          title="Analyze"
+                          className="text-blue-600 hover:underline"
                         >
-                          <AnalyticsIcon />
-                        </IconButton>
-                        <IconButton
-                          color="error"
+                          <AnalyticsIcon fontSize="small" />
+                        </button>
+                        <button
                           onClick={() => handleDeleteFile(file._id)}
-                          title="Delete"
+                          className="text-red-600 hover:underline"
                         >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
+                          <DeleteIcon fontSize="small" />
+                        </button>
+                      </td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </tbody>
+              </table>
+            </div>
           )}
-        </Grid>
-      </Container>
-    </Box>
+        </section>
+      </main>
+    </div>
   );
 };
 

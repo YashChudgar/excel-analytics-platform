@@ -15,7 +15,7 @@ import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import UserDashboard from "./pages/UserDashboard";
+import UserDashboard from "./pages/23UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import ExcelAnalytics from "./pages/ExcelAnalytics";
