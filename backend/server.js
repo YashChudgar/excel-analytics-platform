@@ -8,6 +8,9 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const uploadRoutes = require("./routes/uploadRoutes");
 const userRoutes = require("./routes/user");
+const aiRoutes = require("./routes/aiRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -40,6 +43,8 @@ app.use('/api/auth', authRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/ai", aiRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

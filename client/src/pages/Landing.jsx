@@ -65,11 +65,11 @@ const Landing = () => {
 
   return (
     <>
-     <div className="relative min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 overflow-hidden flex items-center">
+<div className="relative min-h-screen bg-gradient-to-br from-[#e3edf7] to-[#c7d2e3] overflow-hidden flex items-center">
       {/* Background Image Overlay */}
       <div className="absolute inset-0">
         <img
-          src="/images/analytics-bg.jpg"
+          src="/images/excel_analytics_background.png"
           alt="Background"
           className="w-full h-full object-cover opacity-10"
         />
@@ -117,12 +117,12 @@ const Landing = () => {
         </div>
       </div>
     </div>
-  );
-};
+  {/* );
+}; */}
 
 
      {/* Features Section */}
-      <section id="features" className="py-20 bg-gray-100">
+      <section id="features" className="py-20 bg-[#f8fafc]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
             Why Excellytics?
