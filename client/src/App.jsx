@@ -23,7 +23,7 @@ import Profile from "./pages/Profile";
 
 // Components & routes
 import Unauthorized from "./components/Unauthorized";
-
+import UserManagement from "./pages/UserManagement";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminRoute from "./components/AdminRoute";
 import UserRoute from "./components/UserRoute";
@@ -54,6 +54,7 @@ function App() {
                 <Route path="/dashboard" element={<RoleBasedDashboard />} />
                 <Route path="/user-route" element={<UserRoute />} />
                 <Route path="/excel-analytics" element={<ExcelAnalytics />} />
+                <Route path="/admin/users" element={<UserManagement /> } />
                 <Route path="/profile" element={<Profile />} />
               </Route>
 
