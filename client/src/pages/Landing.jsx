@@ -140,173 +140,191 @@ const Landing = () => {
 
 
      {/* Features Section */}
-      <section id="features" className="py-20 bg-[#f8fafc]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
-            Why Excellytics?
-          </h2>
+      <section id="features" className="py-20 bg-gradient-to-br from-indigo-50 via-blue-100 to-purple-100">
+  <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-700 bg-clip-text text-transparent drop-shadow-md">
+      Why Excellytics?
+    </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-2 p-6 flex flex-col justify-between h-full"
-              >
-                <div className="text-indigo-600 mb-4 h-12 flex items-center">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2 min-h-[2.5em]">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 flex-grow min-h-[4.8em]">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+      {features.map((feature, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          className="bg-white border-l-4 border-indigo-500/80 rounded-2xl shadow-xl hover:shadow-2xl transition-transform transform hover:-translate-y-2 p-6 flex flex-col h-full"
+        >
+          <div className="text-indigo-600 mb-4 h-12 flex items-center">
+            {feature.icon}
           </div>
-        </div>
-      </section>
+          <h3 className="text-xl font-semibold mb-2 min-h-[2.5em]">
+            {feature.title}
+          </h3>
+          <p className="text-gray-600 flex-grow min-h-[4.8em]">
+            {feature.description}
+          </p>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* Use Cases Section */}
-      <section id="use-cases" className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
-            Use Cases
-          </h2>
+      <section id="use-cases" className="py-20 bg-gradient-to-br from-indigo-50 via-blue-100 to-purple-100">
+  <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-700 bg-clip-text text-transparent drop-shadow-md">
+      Use Cases
+    </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
-            {useCases.map((useCase, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 shadow-md hover:shadow-xl transform transition-transform hover:-translate-y-2 h-full flex flex-col"
-              >
-                <div className="text-indigo-600 mb-4 h-12 flex items-center">
-                  {useCase.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2 min-h-[2.5em] flex items-center">
-                  {useCase.title}
-                </h3>
-                <p className="text-gray-600 flex-grow leading-relaxed min-h-[4.8em]">
-                  {useCase.description}
-                </p>
-              </motion.div>
-            ))}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+      {useCases.map((useCase, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          className="bg-white border-l-4 border-indigo-500/80 rounded-2xl shadow-xl hover:shadow-2xl transition-transform transform hover:-translate-y-2 p-6 flex flex-col h-full"
+        >
+          <div className="text-indigo-600 mb-4 h-12 flex items-center">
+            {useCase.icon}
           </div>
-        </div>
-      </section>
+          <h3 className="text-xl font-semibold mb-2 min-h-[2.5em]">
+            {useCase.title}
+          </h3>
+          <p className="text-gray-600 flex-grow min-h-[4.8em]">
+            {useCase.description}
+          </p>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
-            How It Works
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative bg-white p-6 pt-10 rounded-2xl shadow hover:shadow-lg transition-all h-full flex flex-col items-center text-center"
-              >
-                <div className="absolute -top-5 w-10 h-10 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-900 text-white flex items-center justify-center font-bold text-lg shadow">
-                  {step.number}
-                </div>
-                <div className="text-indigo-600 mb-4 h-12 flex items-center justify-center">
-                  {step.icon}
-                </div>
-                <h3 className="text-lg font-semibold mb-2 min-h-[2.5em]">
-                  {step.title}
-                </h3>
-                <p className="text-gray-600 min-h-[4.8em]">
-                  {step.description}
-                </p>
-              </motion.div>
-            ))}
+<section id="how-it-works" className="py-20 bg-gradient-to-br from-indigo-50 via-blue-100 to-purple-100">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-700 bg-clip-text text-transparent drop-shadow-md">
+      How It Works
+    </h2>
+
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {steps.map((step, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          className="relative bg-white border-l-4 border-indigo-500/80 rounded-2xl p-6 pt-10 shadow-lg hover:shadow-2xl transform transition-transform hover:-translate-y-2 flex flex-col items-center text-center h-full"
+        >
+          <div className="absolute -top-5 w-10 h-10 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-900 text-white flex items-center justify-center font-bold text-lg shadow">
+            {step.number}
           </div>
-        </div>
-      </section>
+          <div className="text-indigo-600 mb-4 h-12 flex items-center justify-center">
+            {step.icon}
+          </div>
+          <h3 className="text-lg font-semibold mb-2 min-h-[2.5em]">
+            {step.title}
+          </h3>
+          <p className="text-gray-600 min-h-[4.8em]">
+            {step.description}
+          </p>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
 
      {/* Testimonials Section */}
-     <div className="py-20 bg-gray-100 overflow-hidden">
-      <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
-        Trusted by Teams and Professionals Worldwide
-      </h2>
+<div className="py-20 bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-200 overflow-hidden">
+    <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-700 bg-clip-text text-transparent drop-shadow-md">
+    Trusted by Teams and Professionals Worldwide
+  </h2>
 
-      <div className="relative w-full overflow-hidden">
+  <div className="relative w-full overflow-hidden">
+    <motion.div
+      className="flex gap-8 w-max"
+      animate={controls}
+      initial={{ x: "0%" }}
+    >
+      {[...testimonials, ...testimonials].map((testimonial, index) => (
         <motion.div
-          className="flex gap-8 w-max"
-          animate={controls}
-          initial={{ x: "0%" }}
-        >
-          {[...testimonials, ...testimonials].map((testimonial, index) => (
-            <div
-              key={index}
-              className="bg-white min-w-[300px] max-w-sm rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-            >
-              <div className="mb-4">
-                <Rating value={testimonial.rating} readOnly />
-              </div>
-              <p className="italic text-gray-700 flex-grow mb-6">
-                "{testimonial.comment}"
-              </p>
-              <div className="flex items-center gap-4 mt-auto">
-                <Avatar
-                  src={testimonial.avatar}
-                  alt={testimonial.name}
-                  sx={{ width: 48, height: 48 }}
-                />
-                <div>
-                  <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                  <p className="text-sm text-gray-500">{testimonial.role} at {testimonial.company}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </motion.div>
-      </div>
+  key={index}
+  className="relative bg-white min-w-[300px] max-w-sm rounded-3xl p-6 shadow-lg hover:shadow-indigo-300 transition-transform hover:-translate-y-2 border-t-4 border-b-4 border-transparent border-t-indigo-500 border-b-purple-500"
+  initial={{ opacity: 0, scale: 0.95 }}
+  whileInView={{ opacity: 1, scale: 1 }}
+  transition={{ duration: 0.5, ease: "easeOut" }}
+  viewport={{ once: true }}
+>
+  {/* Decorative Quote Icon */}
+  <div className="absolute -top-5 left-4 text-indigo-400 text-4xl opacity-10">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-10 h-10" viewBox="0 0 24 24">
+      <path d="M7.17 6.17A5.94 5.94 0 0 1 12 4c1.73 0 3.29.73 4.41 1.91A6 6 0 0 1 20 10c0 3.31-2.69 6-6 6h-2v2h2c4.42 0 8-3.58 8-8 0-2.21-.89-4.21-2.34-5.66A7.932 7.932 0 0 0 12 2c-2.14 0-4.09.84-5.66 2.34A7.932 7.932 0 0 0 4 10c0 2.21.89 4.21 2.34 5.66A7.932 7.932 0 0 0 12 18c1.66 0 3.19-.51 4.41-1.39L17 16h-2v-2h2c-3.31 0-6-2.69-6-6 0-1.65.67-3.15 1.76-4.24A5.94 5.94 0 0 1 12 4a6.06 6.06 0 0 1-4.83 2.17z"/>
+    </svg>
+  </div>
+
+  {/* Rating */}
+  <div className="mb-3">
+    <Rating value={testimonial.rating} readOnly />
+  </div>
+
+  {/* Comment */}
+  <p className="italic text-gray-700 bg-indigo-50 p-3 rounded-lg mb-6 leading-relaxed">
+    “{testimonial.comment}”
+  </p>
+
+  {/* Avatar and User Info */}
+  <div className="flex items-center gap-4 mt-auto">
+    <motion.div
+  whileHover={{ scale: 1.1 }}
+  whileTap={{ scale: 0.95 }}
+  transition={{ duration: 0.3 }}
+  className={`rounded-full p-1 ring-4 bg-white avatar-wrapper
+    ${
+      testimonial.role.includes("Manager")
+        ? "ring-emerald-500"
+        : testimonial.role.includes("Analyst")
+        ? "ring-indigo-500"
+        : testimonial.role.includes("Director")
+        ? "ring-purple-500"
+        : testimonial.role.includes("Lead")
+        ? "ring-blue-500"
+        : "ring-black-400"
+    }`}
+>
+  <div className="w-12 h-12 rounded-full overflow-hidden relative group hover:animate-[pulse_1.5s_ease-in-out_infinite]">
+    <Avatar
+      src={testimonial.avatar}
+      alt={testimonial.name}
+      sx={{ width: "100%", height: "100%" }}
+      className="bg-indigo-100"
+    />
+  </div>
+</motion.div>
+
+
+    <div>
+      <p className="font-semibold text-indigo-700">{testimonial.name}</p>
+      <p className="text-sm text-gray-500">
+        {testimonial.role} at <span className="text-blue-700 font-medium">{testimonial.company}</span>
+      </p>
     </div>
-        {/* <div className="py-20 bg-gray-100">
-          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
-            Trusted by Teams and Professionals Worldwide
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-              >
-                <div className="mb-4">
-                  <Rating value={testimonial.rating} readOnly />
-                </div>
-                <p className="italic text-gray-700 flex-grow mb-6">
-                  "{testimonial.comment}"
-                </p>
-                <div className="flex items-center gap-4 mt-auto">
-                  <Avatar src={testimonial.avatar} alt={testimonial.name} sx={{ width: 48, height: 48 }} />
-                  <div>
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <p className="text-sm text-gray-500">{testimonial.role} at {testimonial.company}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div> */}
+  </div>
+</motion.div>
+
+      ))}
+    </motion.div>
+  </div>
+</div>
 
 
      {/* CTA Section */}
-<div id="contact" className="py-20 bg-white">
+<div id="contact" className="py-20 bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-200">
   <div className="max-w-2xl mx-auto px-6 text-center">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -314,10 +332,10 @@ const Landing = () => {
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
     >
-      <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+      <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
         Ready to Unlock the Power of Excel?
       </h2>
-      <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+      <p className="text-lg text-blue-600 mb-6 leading-relaxed">
         Join teams transforming spreadsheets into business intelligence dashboards.
       </p>
       <div className="flex flex-wrap justify-center gap-4">
@@ -333,6 +351,7 @@ const Landing = () => {
     </motion.div>
   </div>
 </div>
+
 <Footer />
 </>
   );
