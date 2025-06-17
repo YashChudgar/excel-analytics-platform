@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BarChart,
@@ -17,7 +17,7 @@ import {
   Share,
 } from "@mui/icons-material";
 import { Avatar, Rating } from "@mui/material";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import Footer from "../components/Footer";
 
 
@@ -41,6 +41,14 @@ const Landing = () => {
       icon: <CodeOff fontSize="large" />, title: "No-Code Interface", description: "Designed for everyone, not just data experts. Start analyzing data in minutes."
     },
   ];
+  const testimonials = [
+  { name: "Alice Johnson", role: "Data Analyst", company: "TechNova", rating: 5, comment: "Excellytics helped us streamline our reporting process drastically.", avatar: "/images/avatar1.jpg" },
+  { name: "David Lee", role: "Project Manager", company: "InnoCore", rating: 4, comment: "An intuitive tool with powerful charting features. Highly recommend!", avatar: "/images/avatar2.jpg" },
+  { name: "Emily Rodriguez", role: "Marketing Director", company: "Growth Marketing", rating: 5, comment: "Finally, a tool that makes data visualization accessible to everyone. The integration with our existing tools is seamless.", avatar: "/images/avatar3.jpg" },
+  { name: "Carlos Mendez", role: "Operations Head", company: "LogistiCore", rating: 5, comment: "Game-changing tool for handling large Excel datasets effortlessly!", avatar: "/images/avatar4.jpg" },
+  { name: "Priya Sharma", role: "Marketing Analyst", company: "BrightEdge", rating: 4, comment: "The 3D charts gave our presentations a whole new look.", avatar: "/images/avatar5.jpg" },
+  { name: "Liam O'Connor", role: "Team Lead", company: "Fintract", rating: 5, comment: "We onboarded the whole team in minutes. Super user-friendly.", avatar: "/images/avatar6.jpg" },
+];
 
   const useCases = [
     { icon: <BusinessCenter fontSize="large" />, title: "Business Analysts", description: "Rapid reporting and visual exploration of complex data sets with interactive dashboards." },
@@ -57,11 +65,21 @@ const Landing = () => {
     { icon: <Share fontSize="large" />, title: "Share & Export", description: "Share with team members or export in various formats with one click.", number: "04" },
   ];
 
-  const testimonials = [
-    { name: "Sarah Johnson", role: "Business Analyst", company: "TechCorp", rating: 5, comment: "Excellytics has transformed how we handle data. The AI insights are incredibly accurate and save us hours of analysis.", avatar: "/images/avatar1.jpg" },
-    { name: "Michael Chen", role: "Project Manager", company: "Innovate Inc", rating: 5, comment: "The real-time dashboards have revolutionized our project tracking. Our stakeholders love the visual reports.", avatar: "/images/avatar2.jpg" },
-    { name: "Emily Rodriguez", role: "Marketing Director", company: "Growth Marketing", rating: 5, comment: "Finally, a tool that makes data visualization accessible to everyone. The integration with our existing tools is seamless.", avatar: "/images/avatar3.jpg" },
-  ];
+  const controls = useAnimation();
+
+  useEffect(() => {
+    const animate = async () => {
+      while (true) {
+        await controls.start({
+          x: "-50%", // only half, because we duplicate the list
+          transition: { duration: 20, ease: "linear" },
+        });
+        // Reset to start
+        controls.set({ x: "0%" });
+      }
+    };
+    animate();
+  }, [controls]);
 
   return (
     <>
@@ -217,7 +235,45 @@ const Landing = () => {
       </section>
 
      {/* Testimonials Section */}
-        <div className="py-20 bg-gray-100">
+     <div className="py-20 bg-gray-100 overflow-hidden">
+      <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
+        Trusted by Teams and Professionals Worldwide
+      </h2>
+
+      <div className="relative w-full overflow-hidden">
+        <motion.div
+          className="flex gap-8 w-max"
+          animate={controls}
+          initial={{ x: "0%" }}
+        >
+          {[...testimonials, ...testimonials].map((testimonial, index) => (
+            <div
+              key={index}
+              className="bg-white min-w-[300px] max-w-sm rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="mb-4">
+                <Rating value={testimonial.rating} readOnly />
+              </div>
+              <p className="italic text-gray-700 flex-grow mb-6">
+                "{testimonial.comment}"
+              </p>
+              <div className="flex items-center gap-4 mt-auto">
+                <Avatar
+                  src={testimonial.avatar}
+                  alt={testimonial.name}
+                  sx={{ width: 48, height: 48 }}
+                />
+                <div>
+                  <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                  <p className="text-sm text-gray-500">{testimonial.role} at {testimonial.company}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+        {/* <div className="py-20 bg-gray-100">
           <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-indigo-900 bg-clip-text text-transparent">
             Trusted by Teams and Professionals Worldwide
           </h2>
@@ -246,7 +302,8 @@ const Landing = () => {
               </motion.div>
             ))}
           </div>
-        </div>
+        </div> */}
+
 
      {/* CTA Section */}
 <div id="contact" className="py-20 bg-white">
