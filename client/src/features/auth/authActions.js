@@ -2,7 +2,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../api/axiosInstance';
 
-// ✅ Login Thunk
+//  Login Thunk
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
@@ -21,7 +21,7 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// ✅ Register Thunk (add this below loginUser)
+//  Register Thunk (add this below loginUser)
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async ({ username, email, password }, { rejectWithValue }) => {
@@ -43,3 +43,17 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+
+//Update User Thunk (add this below registerUser)
+export const updateUser = createAsyncThunk(
+  "auth/updateUser",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.put("/user/profile", formData); // adjust route if needed
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Update failed");
+    }
+  }
+);
+
