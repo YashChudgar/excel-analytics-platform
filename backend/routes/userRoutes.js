@@ -1,7 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const { auth } = require("../middlewares/auth");
-const { getUserActivities } = require("../controllers/userActivityController");
+
+const {
+  getUserStats,
+  getUserActivities,
+  updateUserProfile,
+} = require("../controllers/userController");
+
 const {
   getUserFiles,
   deleteFile,
@@ -9,10 +15,19 @@ const {
   updateFileAnalysis,
 } = require("../controllers/userFileController");
 
-// Activity routes
+// 📊 User statistics
+router.get("/stats", auth, getUserStats);
+
+// 🧠 Activities
 router.get("/activities", auth, getUserActivities);
 
-// File routes
+// 📝 Profile Update (✅ This is the key route you're debugging)
+router.put("/profile", auth, (req, res, next) => {
+  console.log("🔥 Route hit: /api/user/profile");
+  next();
+}, updateUserProfile);
+
+// 📁 File routes
 router.get("/files", auth, getUserFiles);
 router.get("/files/:fileId", auth, getFileById);
 router.delete("/files/:fileId", auth, deleteFile);
