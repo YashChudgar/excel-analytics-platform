@@ -1,5 +1,8 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const bcrypt = require("bcryptjs");
 
 const generateToken = (userId) => 
   jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -31,21 +34,34 @@ const register = async (req, res) => {
   }
 };
 
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user || !(await user.comparePassword(password))) {
+    const user = await User.findOne({ email }).select("+password"); // ✅ select password
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+
+    const isMatch = await user.comparePassword(password); // this calls bcrypt.compare internally
+    console.log("Comparing:", password, "with:", user.password);
+    console.log("Match result:", isMatch);
+
+    if (!isMatch) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     const token = generateToken(user._id);
     res.json({ success: true, user: formatUser(user), token });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
 
 const getProfile = async (req, res) => {
   try {
@@ -76,4 +92,87 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getProfile, updateProfile };
+const googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub, email, name, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      const generatedUsername = email.split('@')[0] + Math.floor(Math.random() * 1000);
+
+      user = await User.create({
+        username: generatedUsername,
+        name,
+        email,
+        profilePic: picture,
+        googleId: sub,
+        password: Math.random().toString(36).slice(-8), // placeholder password
+      });
+    }
+
+    // Create JWT
+    const tokenJWT = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.status(200).json({ user, token: tokenJWT });
+
+  } catch (err) {
+    console.error("Google login error:", err);
+    res.status(401).json({ message: "Google login failed" });
+  }
+};
+
+const checkUserExists = async (req, res) => {
+  const { email } = req.body;
+  console.log("Checking email:", email);
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user)
+      return res.status(404).json({ message: "No user found with this email" });
+
+    res.json({ message: "User verified" });
+  } catch (err) {
+    console.error("Error in checkUserExists:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+const resetPasswordDirect = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ❌ DON'T hash manually
+    user.password = password;
+
+    await user.save();
+
+    console.log("✅ Password updated for:", user.email);
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("❌ Error in resetPasswordDirect:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+module.exports = { register, login, getProfile, updateProfile, googleLogin, checkUserExists, resetPasswordDirect };
