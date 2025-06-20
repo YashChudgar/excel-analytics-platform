@@ -2,15 +2,23 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api", // your backend URL
+  baseURL: "http://localhost:5000/api",
 });
 
-// Add token to headers for every request if available
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const publicEndpoints = ["/auth/login", "/auth/register", "/auth/google"];
+  const isPublicEndpoint = publicEndpoints.some((endpoint) =>
+    config.url.includes(endpoint)
+  );
+
+  // Only attach token if it's not a public endpoint
+  if (!isPublicEndpoint) {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
+
   return config;
 });
 
