@@ -113,7 +113,7 @@ const Dashboard = () => {
   ];
 
 return (
-  <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-blue-100 text-gray-800">
+  <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-blue-100 text-gray-800 pt-22">
     <main className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: -30 }}
@@ -121,7 +121,7 @@ return (
         transition={{ duration: 0.6 }}
         className="bg-gradient-to-r from-indigo-500 to-indigo-700 text-white p-6 rounded-3xl shadow-2xl"
       >
-        <h2 className="text-3xl font-bold mb-2">Welcome back, {user?.username}!</h2>
+        <h2 className="text-3xl font-bold mb-2">Welcome {user?.username}!</h2>
         <p className="text-lg">Here's an overview of your analytics and activities</p>
       </motion.div>
 

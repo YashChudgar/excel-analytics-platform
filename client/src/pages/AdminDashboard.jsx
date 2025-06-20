@@ -90,14 +90,14 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="max-w-7xl mx-auto px-4 py-6 pt-22">
       <motion.div
         className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-6 rounded-xl shadow-lg mb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-semibold mb-1">Welcome back, {user?.username}!</h1>
+        <h1 className="text-3xl font-semibold mb-1">Welcome {user?.username}!</h1>
         <p className="text-sm">Manage your platform and monitor analytics</p>
       </motion.div>
 
