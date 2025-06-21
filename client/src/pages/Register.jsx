@@ -37,11 +37,12 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setError("");
   };
+const [message, setMessage] = useState("");
 
-
- const handleGoogleLogin = async (response) => {
+const handleGoogleLogin = async (response) => {
   if (!response || !response.credential) {
-    console.error("Google login: No credential received");
+    console.error("Google register: No credential received");
+    setError("Google registration failed. No credential received.");
     return;
   }
 
@@ -49,7 +50,7 @@ const Register = () => {
   console.log("Google credential:", tokenId);
 
   try {
-    const res = await axiosInstance.post("/auth/google", {
+    const res = await axiosInstance.post("/auth/google/register", {
       token: tokenId,
     });
 
@@ -62,11 +63,19 @@ const Register = () => {
       payload: { user, token },
     });
 
+    setMessage("Registration successful!");
+    setError("");
+
     navigate("/dashboard");
   } catch (err) {
-    console.error("Google login failed:", err);
+    console.error("Google registration failed:", err);
+    setError(
+      err.response?.data?.message || "Google registration failed. Please try again."
+    );
+    setMessage("");
   }
 };
+
 
 
 useEffect(() => {
@@ -275,6 +284,7 @@ function FeatureItem({ icon: Icon, title, description }) {
                     required
                     className="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   />
+
                   <motion.button
                     type="submit"
                     whileHover={{ scale: 1.02 }}

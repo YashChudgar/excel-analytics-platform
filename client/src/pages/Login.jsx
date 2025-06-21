@@ -55,6 +55,7 @@ const Login = () => {
   // Local state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -106,33 +107,42 @@ const Login = () => {
 
   
   const handleGoogleLogin = async (response) => {
-   if (!response || !response.credential) {
-     console.error("Google login: No credential received");
-     return;
-   }
- 
-   const tokenId = response.credential;
-   console.log("Google credential:", tokenId);
- 
-   try {
-     const res = await axiosInstance.post("/auth/google", {
-       token: tokenId,
-     });
- 
-     const { user, token } = res.data;
-     localStorage.setItem("token", token);
-     localStorage.setItem("user", JSON.stringify(user));
- 
-     dispatch({
-       type: "auth/loginUser/fulfilled",
-       payload: { user, token },
-     });
- 
-     navigate("/dashboard");
-   } catch (err) {
-     console.error("Google login failed:", err);
-   }
- };
+  if (!response || !response.credential) {
+    console.error("Google login: No credential received");
+    setError("Google login failed. No credential received.");
+    return;
+  }
+
+  const tokenId = response.credential;
+  console.log("Google credential:", tokenId);
+
+  try {
+    const res = await axiosInstance.post("/auth/google/login", {
+      token: tokenId,
+    });
+
+    const { user, token } = res.data;
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    dispatch({
+      type: "auth/loginUser/fulfilled",
+      payload: { user, token },
+    });
+
+    setMessage("Login successful!");
+    setError("");
+
+    navigate("/dashboard");
+  } catch (err) {
+    console.error("Google login failed:", err);
+    setError(
+      err.response?.data?.message || "Google login failed. Please try again."
+    );
+    setMessage("");
+  }
+};
+
  
  
  useEffect(() => {
@@ -450,7 +460,6 @@ const Login = () => {
     Forgot password?
   </a>
 </div>
-
 
 
                     <Button

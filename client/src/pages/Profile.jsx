@@ -79,7 +79,7 @@ const Profile = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatCard icon={<FaDatabase />} title="Total Files" value={stats.totalFiles} color="text-indigo-600" />
           <StatCard icon={<FaChartBar />} title="Analyses" value={stats.totalAnalyses} color="text-sky-500" />
-          <StatCard icon={<FaUser />} title="Last Active" value={format(new Date(stats.lastActive), "MMM d")} color="text-emerald-500" />
+          <StatCard icon={<FaUser />} title="Last Active" value={format(new Date(stats.lastActive), "MMM d")} color="text-blue-500" />
         </div>
 
         {error && <div className="bg-red-100 text-red-700 p-4 rounded mb-4">{error}</div>}

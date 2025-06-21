@@ -24,11 +24,13 @@ import {
   IconButton,
   Menu,
 } from "@mui/material";
+import Skeleton from '@mui/material/Skeleton';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DownloadIcon from "@mui/icons-material/Download";
 import { styled } from "@mui/material/styles";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 import * as XLSX from "xlsx";
+import ReactSelect  from "react-select";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import {
@@ -43,11 +45,13 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
+import { motion } from "framer-motion";
 import { Line as ChartLine, Bar, Pie } from "react-chartjs-2";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
-
+import DashboardLayout from "../components/DashboardLayout";
+import { toast } from "react-toastify";
 // Register Chart.js components
 ChartJS.register(
   CategoryScale,
@@ -60,6 +64,38 @@ ChartJS.register(
   Legend,
   ArcElement
 );
+
+// Styled components with theme colors
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  background: "rgba(255, 255, 255, 0.9)",
+  backdropFilter: "blur(10px)",
+  borderRadius: "16px",
+  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+  padding: theme.spacing(4),
+  marginBottom: theme.spacing(4),
+}));
+
+const GradientTypography = styled(Typography)(({ theme }) => ({
+  background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  fontWeight: 600,
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  borderRadius: "8px",
+  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+  textTransform: "none",
+  fontWeight: 600,
+  transition: "all 0.2s ease-in-out",
+  "&:hover": {
+    transform: "scale(1.02)",
+    boxShadow:
+      "0 6px 8px -1px rgb(0 0 0 / 0.15), 0 3px 6px -2px rgb(0 0 0 / 0.15)",
+  },
+}));
+
+
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -75,46 +111,27 @@ const VisuallyHiddenInput = styled("input")({
 
 const ChartTooltip = ({ position, xValue, yValue }) => {
   return (
-    <Html position={position}>
-      <div
-        style={{
-          background: "rgba(255, 255, 255, 0.95)",
-          color: "#333",
-          padding: "12px 16px",
-          borderRadius: "8px",
-          fontSize: "14px",
-          pointerEvents: "none",
-          whiteSpace: "nowrap",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-          border: "1px solid rgba(0, 0, 0, 0.1)",
-          backdropFilter: "blur(4px)",
-          transform: "translate(-50%, -100%)",
-          transition: "all 0.2s ease-in-out",
-        }}
-      >
-        <div
-          style={{ fontWeight: "bold", marginBottom: "4px", color: "#1976d2" }}
-        >
-          Data Point
+  <Html position={position}>
+    <div className="bg-white/95 text-slate-800 px-4 py-3 rounded-lg text-sm pointer-events-none whitespace-nowrap shadow-lg border border-black/10 backdrop-blur-sm transform -translate-x-1/2 -translate-y-full transition-all duration-200 ease-in-out">
+      <div className="font-bold mb-1 text-indigo-600">Data Point</div>
+      <div className="flex flex-col gap-1">
+        <div>
+          <span className="text-slate-500">X: </span>
+          {xValue}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-          <div>
-            <span style={{ color: "#666" }}>X: </span>
-            {xValue}
-          </div>
-          <div>
-            <span style={{ color: "#666" }}>Y: </span>
-            {yValue}
-          </div>
+        <div>
+          <span className="text-slate-500">Y: </span>
+          {yValue}
         </div>
       </div>
-    </Html>
-  );
+    </div>
+  </Html>
+);
+
 };
 
 const ChartPoints = ({ data, labels, minValue, maxValue, scale }) => {
   const [hoveredPoint, setHoveredPoint] = useState(null);
-  const pointsRef = useRef([]);
 
   return (
     <group>
@@ -129,34 +146,58 @@ const ChartPoints = ({ data, labels, minValue, maxValue, scale }) => {
               position={[x, y, z]}
               onPointerOver={() => setHoveredPoint(index)}
               onPointerOut={() => setHoveredPoint(null)}
-              ref={(el) => (pointsRef.current[index] = el)}
+              scale={hoveredPoint === index ? 1.2 : 1}
             >
               <sphereGeometry args={[0.1, 32, 32]} />
               <meshStandardMaterial
-                color={hoveredPoint === index ? "#1976d2" : "#4caf50"}
-                emissive={hoveredPoint === index ? "#1976d2" : "#4caf50"}
+                color={hoveredPoint === index ? "#4f46e5" : "#10b981"}
+                emissive={hoveredPoint === index ? "#4f46e5" : "#10b981"}
                 emissiveIntensity={hoveredPoint === index ? 0.3 : 0}
                 metalness={0.6}
                 roughness={0.4}
               />
             </mesh>
-            {/* Add connecting lines between points */}
+
+            {/* Line to next point */}
             {index < data.length - 1 && (
               <line>
-                <bufferGeometry attach="geometry" />
-                <lineBasicMaterial
-                  attach="material"
-                  color="rgba(76, 175, 80, 0.3)"
-                  linewidth={1}
-                />
+                <bufferGeometry>
+                  <bufferAttribute
+                    attach="attributes-position"
+                    count={2}
+                    array={new Float32Array([
+                      x,
+                      y,
+                      z,
+                      (index + 1) / (data.length - 1) * 5 - 2.5,
+                      (data[index + 1] - minValue) * scale - 2.5,
+                      0,
+                    ])}
+                    itemSize={3}
+                  />
+                </bufferGeometry>
+                <lineBasicMaterial color="#10b981" linewidth={1} />
               </line>
             )}
+
+            {/* 3D Tooltip using Html */}
             {hoveredPoint === index && (
-              <ChartTooltip
+              <Html
                 position={[x, y + 0.3, z]}
-                xValue={labels[index]}
-                yValue={value}
-              />
+                center
+                style={{
+                  background: "white",
+                  padding: "4px 8px",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                  color: "#111827",
+                  pointerEvents: "none",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {labels[index]}: {value}
+              </Html>
             )}
           </group>
         );
@@ -166,6 +207,7 @@ const ChartPoints = ({ data, labels, minValue, maxValue, scale }) => {
 };
 
 const ExcelAnalytics = () => {
+  // State variables
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -180,100 +222,33 @@ const ExcelAnalytics = () => {
   const [chartType, setChartType] = useState("2d");
   const [is3D, setIs3D] = useState(false);
   const [downloadAnchorEl, setDownloadAnchorEl] = useState(null);
-  const chartRef = useRef(null);
-  const chartContainerRef = useRef(null);
   const [fileId, setFileId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showChartConfig, setShowChartConfig] = useState(false);
+const [customFilename, setCustomFilename] = useState("");
+const [showWatermark, setShowWatermark] = useState(true);
+const [isDarkMode, setIsDarkMode] = useState(false);
 
-  useEffect(() => {
-    // Get fileId from URL if present
-    const params = new URLSearchParams(window.location.search);
-    const fileIdParam = params.get("fileId");
-    if (fileIdParam) {
-      setFileId(fileIdParam);
-      fetchFileData(fileIdParam);
+  // Refs
+  const chartRef = useRef(null);
+  const chartContainerRef = useRef(null);
+useEffect(() => {
+  console.log("🧪 chartType changed:", chartType);
+}, [chartType]);
+
+// Animated Camera Component
+const AnimatedCamera = () => {
+  const cameraRef = useRef();
+  useFrame(({ camera }) => {
+    // Smooth entrance animation (z to 8)
+    if (camera.position.z > 8) {
+      camera.position.z -= 0.1;
     }
-  }, []);
+  });
+  return null;
+};
 
-  const loadFileData = async (url, fileName) => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const response = await axios.get(url, {
-        responseType: "arraybuffer",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-
-      const data = new Uint8Array(response.data);
-      const workbook = XLSX.read(data, { type: "array" });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
-        header: 1,
-        raw: false,
-        defval: null,
-      });
-
-      if (!jsonData || jsonData.length === 0) {
-        throw new Error("No data found in Excel file");
-      }
-
-      const headers = jsonData[0] || [];
-      const previewRows = jsonData.slice(1, 6);
-      const completeRows = jsonData.slice(1);
-
-      const previewDataObj = {
-        headers,
-        rows: previewRows,
-        totalRows: jsonData.length - 1,
-        totalColumns: headers.length,
-        fileName: fileName,
-      };
-
-      const completeDataObj = {
-        headers,
-        rows: completeRows,
-        totalRows: jsonData.length - 1,
-        totalColumns: headers.length,
-        fileName: fileName,
-      };
-
-      setPreviewData(previewDataObj);
-      setCompleteData(completeDataObj);
-    } catch (error) {
-      console.error("Error loading file data:", error);
-      setError(error.message || "Error loading file data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchFileData = async (fileId) => {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await axios.get(`/api/user/files/${fileId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      const fileData = response.data;
-
-      if (!fileData) {
-        throw new Error("No file data received");
-      }
-
-      // Set the file data
-      setUploadedFile(fileData);
-
-      // Load the file data for analysis
-      await loadFileData(fileData.cloudinaryUrl, fileData.originalName);
-    } catch (error) {
-      console.error("Error fetching file data:", error);
-      setError(error.response?.data?.error || "Error loading file data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Handlers
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
@@ -283,7 +258,6 @@ const ExcelAnalytics = () => {
         size: selectedFile.size,
       });
 
-      // Check if file is an Excel file
       if (
         selectedFile.type ===
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
@@ -292,30 +266,20 @@ const ExcelAnalytics = () => {
         setFile(selectedFile);
         setError("");
 
-        // Read and preview the Excel file
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: "array" });
-
-            // Get the first sheet
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-
-            // Convert to JSON with header option
             const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
               header: 1,
               raw: false,
               defval: null,
             });
 
-            // Get column headers (first row)
             const headers = jsonData[0] || [];
-
-            // Get preview data (first 5 rows)
             const previewRows = jsonData.slice(1, 6);
-
-            // Store complete data
             const completeRows = jsonData.slice(1);
 
             setPreviewData({
@@ -363,115 +327,11 @@ const ExcelAnalytics = () => {
   };
 
   const handleChartTypeChange = (event, newType) => {
-    if (newType !== null) {
-      setChartType(newType);
-      setIs3D(newType === "3d");
-    }
-  };
+  if (newType !== null) {
+    setChartType(newType); // "2d" or "3d"
+  }
+};
 
-  const generateChartData = () => {
-    if (!completeData || !selectedXAxis || !selectedYAxis) return;
-
-    const xIndex = completeData.headers.indexOf(selectedXAxis);
-    const yIndex = completeData.headers.indexOf(selectedYAxis);
-
-    if (xIndex === -1 || yIndex === -1) return;
-
-    // Convert data to numbers and filter out invalid values
-    const labels = completeData.rows.map((row) => row[xIndex]);
-    const data = completeData.rows.map((row) => {
-      const value = parseFloat(row[yIndex]);
-      return isNaN(value) ? 0 : value;
-    });
-
-    console.log("Chart Data:", { labels, data }); // Debug log
-
-    const chartConfig = {
-      labels,
-      datasets: [
-        {
-          label: `${selectedYAxis} vs ${selectedXAxis}`,
-          data,
-          borderColor: "rgb(75, 192, 192)",
-          backgroundColor: "rgba(75, 192, 192, 0.5)",
-        },
-      ],
-    };
-
-    setChartData(chartConfig);
-
-    // Update file analysis timestamp
-    if (fileId) {
-      axios
-        .post(
-          `/api/user/files/${fileId}/analyze`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        )
-        .then((response) => {
-          console.log("Analysis timestamp updated:", response.data);
-        })
-        .catch((error) => {
-          console.error("Error updating analysis timestamp:", error);
-        });
-    }
-  };
-
-  const render3DChart = () => {
-    if (!chartData) return null;
-
-    const data = chartData.datasets[0].data;
-    const labels = chartData.labels;
-    const maxValue = Math.max(...data);
-    const minValue = Math.min(...data);
-    const range = maxValue - minValue;
-    const scale = range === 0 ? 1 : 5 / range;
-
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "400px",
-          background: "linear-gradient(to bottom, #ffffff, #f5f5f5)",
-          borderRadius: "8px",
-          overflow: "hidden",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
-          border: "1px solid rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <Canvas
-          camera={{ position: [0, 0, 5], fov: 75 }}
-          style={{ background: "transparent" }}
-        >
-          <OrbitControls
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
-            minDistance={3}
-            maxDistance={10}
-          />
-          <ambientLight intensity={0.6} />
-          <pointLight position={[10, 10, 10]} intensity={0.6} />
-          <pointLight position={[-10, -10, -10]} intensity={0.3} />
-          <ChartPoints
-            data={data}
-            labels={labels}
-            minValue={minValue}
-            maxValue={maxValue}
-            scale={scale}
-          />
-          <gridHelper
-            args={[5, 10, "rgba(0, 0, 0, 0.2)", "rgba(0, 0, 0, 0.1)"]}
-            position={[0, -2.5, 0]}
-          />
-        </Canvas>
-      </div>
-    );
-  };
 
   const handleDownloadClick = (event) => {
     setDownloadAnchorEl(event.currentTarget);
@@ -481,490 +341,864 @@ const ExcelAnalytics = () => {
     setDownloadAnchorEl(null);
   };
 
-  const downloadAsPNG = async () => {
-    if (!chartContainerRef.current) return;
+ // Helper to wait for canvas rendering stability
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-    try {
-      // Show loading state
-      setUploading(true);
+const downloadAsPNG = async () => {
+  if (!chartContainerRef.current) return;
 
-      // Wait for the next render cycle
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const canvas = await html2canvas(chartContainerRef.current, {
-        scale: 2, // Higher quality
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-      });
-
-      // Create download link
-      const link = document.createElement("a");
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      link.download = `chart-${timestamp}.png`;
-      link.href = canvas.toDataURL("image/png", 1.0);
-
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading PNG:", error);
-      setError("Error downloading chart as PNG. Please try again.");
-    } finally {
-      setUploading(false);
-      handleDownloadClose();
-    }
-  };
-
-  const downloadAsPDF = async () => {
-    if (!chartContainerRef.current) return;
-
-    try {
-      // Show loading state
-      setUploading(true);
-
-      // Wait for the next render cycle
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const canvas = await html2canvas(chartContainerRef.current, {
-        scale: 2, // Higher quality
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-      });
-
-      // Create PDF
-      const imgData = canvas.toDataURL("image/png", 1.0);
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "px",
-        format: [canvas.width, canvas.height],
-      });
-
-      // Add image to PDF
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-
-      // Save PDF
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      pdf.save(`chart-${timestamp}.pdf`);
-    } catch (error) {
-      console.error("Error downloading PDF:", error);
-      setError("Error downloading chart as PDF. Please try again.");
-    } finally {
-      setUploading(false);
-      handleDownloadClose();
-    }
-  };
-
-  const renderChart = () => {
-    if (!chartData) return null;
-
-    console.log("Rendering Chart:", chartData);
-
-    const chartOptions = {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-        },
-        title: {
-          display: true,
-          text: `${selectedYAxis} vs ${selectedXAxis}`,
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-        },
-      },
-    };
-
-    if (is3D) {
-      return render3DChart();
-    }
-
-    switch (chartStyle) {
-      case "line":
-        return (
-          <ChartLine ref={chartRef} data={chartData} options={chartOptions} />
-        );
-      case "bar":
-        return <Bar ref={chartRef} data={chartData} options={chartOptions} />;
-      case "pie":
-        return <Pie ref={chartRef} data={chartData} options={chartOptions} />;
-      default:
-        return null;
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!file) {
-      setError("Please select a file first");
-      return;
-    }
-
+  try {
     setUploading(true);
+    await delay(100); // Wait for animations or rendering to settle
+
+    const canvas = await html2canvas(chartContainerRef.current, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
+
+    const link = document.createElement("a");
+
+    const baseName =
+      customFilename?.trim() || `${selectedYAxis}_vs_${selectedXAxis}` || "chart";
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+
+    link.download = `${baseName}-${timestamp}.png`;
+    link.href = canvas.toDataURL("image/png", 1.0);
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success("📊 Chart downloaded as PNG!");
+  } catch (error) {
+    console.error("❌ Error downloading PNG:", error);
+    setError("Error downloading chart as PNG. Please try again.");
+  } finally {
+    setUploading(false);
+    handleDownloadClose();
+  }
+};
+
+
+const downloadAsPDF = async () => {
+  if (!chartContainerRef.current) return;
+
+  try {
+    setUploading(true);
+    await delay(100); // Let animations complete
+
+    const canvas = await html2canvas(chartContainerRef.current, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
+
+    const imgData = canvas.toDataURL("image/png", 1.0);
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [canvas.width, canvas.height],
+    });
+
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+
+// Safely set filename
+const baseName =
+  customFilename?.trim() || `${selectedYAxis}_vs_${selectedXAxis}` || "chart";
+const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+
+// Save the PDF with the filename
+pdf.save(`${baseName}-${timestamp}.pdf`);
+
+toast.success("Chart downloaded successfully!");
+
+  } catch (error) {
+    console.error("❌ Error downloading PDF:", error);
+    setError("Error downloading chart as PDF. Please try again.");
+  } finally {
+    setUploading(false);
+    handleDownloadClose();
+  }
+};
+
+
+const generateChartData = () => {
+  if (!completeData || !selectedXAxis || !selectedYAxis) return;
+
+  const xIndex = completeData.headers.indexOf(selectedXAxis);
+  const yIndex = completeData.headers.indexOf(selectedYAxis);
+
+  if (xIndex === -1 || yIndex === -1) return;
+
+  let labels = completeData.rows.map((row) => row[xIndex]);
+  let data = completeData.rows.map((row) => {
+    const value = parseFloat(row[yIndex]);
+    return isNaN(value) ? 0 : value;
+  });
+
+  console.log("Selected X:", selectedXAxis);
+  console.log("Selected Y:", selectedYAxis);
+  console.log("Labels:", labels);
+  console.log("Data:", data);
+
+  // ✅ If chart is pie, limit data to top 10 items
+  if (chartStyle === "pie") {
+    const topN = 10;
+
+    labels = labels.slice(0, topN);
+    data = data.slice(0, topN);
+  }
+
+  const chartConfig = {
+    labels,
+    datasets: [
+      {
+        label: `${selectedYAxis} vs ${selectedXAxis}`,
+        data,
+        borderColor: "rgb(75, 192, 192)",
+        backgroundColor: "rgba(75, 192, 192, 0.5)", // for line/bar — will be styled later for pie
+      },
+    ],
+  };
+
+  setChartData(chartConfig);
+  console.log("✅ Chart config set:", chartConfig);
+
+  // Update analysis timestamp
+  if (fileId) {
+    axiosInstance
+      .post(
+        `/user/files/${fileId}/analyze`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Analysis timestamp updated:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error updating analysis timestamp:", error);
+      });
+  }
+};
+
+
+const handleUpload = async () => {
+  if (!file) {
+    setError("Please select a file first");
+    return;
+  }
+
+  setUploading(true);
+  setError("");
+  setSuccess("");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    setError("Please log in to upload files");
+    setUploading(false);
+    return;
+  }
+
+  try {
+    console.log("Uploading file:", {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    });
+
+    const response = await axiosInstance.post("/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Upload response:", response.data);
+
+    const uploaded = response?.data?.upload;
+    if (!uploaded || !uploaded.cloudinaryUrl || !uploaded._id) {
+      throw new Error("Unexpected response format from server");
+    }
+
+    // Clear any previous error
     setError("");
+    // setSuccess("File uploaded successfully!");
+    setUploadedFile(uploaded);
+    setFileId(uploaded._id);
+    setFile(null);
+    setPreviewData(null);
+    setShowChartConfig(true); // Show chart config after successful upload
+    const fileInput = document.getElementById("file-upload");
+    if (fileInput) fileInput.value = "";
+
+  } catch (err) {
+    console.error("Upload error:", {
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status,
+    });
+
+    // Clear previous success if error occurs
     setSuccess("");
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    // Get the token from localStorage
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (err.response?.status === 401) {
       setError("Please log in to upload files");
-      setUploading(false);
-      return;
+    } else {
+      setError(err.response?.data?.message || err.message || "Error uploading file");
     }
+  } finally {
+    setUploading(false);
+  }
+};
 
-    try {
-      console.log("Uploading file:", {
-        name: file.name,
-        type: file.type,
-        size: file.size,
-      });
 
-      const response = await axios.post("/api/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+const watermarkPlugin = {
+  id: "customWatermark",
+  beforeDraw: (chart) => {
+    const { width, height, ctx } = chart;
+    ctx.save();
+    ctx.font = "bold italic 40px sans-serif";
+    ctx.fillStyle = "rgba(203, 213, 225, 0.08)"; // slate-200 with opacity
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.translate(width / 2, height / 2);
+    ctx.rotate(-Math.PI / 6);
+    ctx.fillText("Excellytics", 0, 0);
+    ctx.restore();
+  },
+};
 
-      console.log("Upload response:", response.data);
 
-      setSuccess("File uploaded successfully!");
-      setUploadedFile(response.data.data);
-      setFileId(response.data.data.id);
-      setFile(null);
-      setPreviewData(null);
-      // Reset file input
-      document.getElementById("file-upload").value = "";
-    } catch (err) {
-      console.error("Upload error:", {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-      });
+const render3DChart = () => {
+  if (!chartData) return null;
 
-      if (err.response?.status === 401) {
-        setError("Please log in to upload files");
-      } else {
-        setError(err.response?.data?.message || "Error uploading file");
-      }
-    } finally {
-      setUploading(false);
-    }
-  };
+  const data = chartData.datasets[0].data;
+  const labels = chartData.labels;
+  const maxValue = Math.max(...data);
+  const minValue = Math.min(...data);
+  const range = maxValue - minValue;
+  const scale = range === 0 ? 1 : 5 / range;
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* Main Upload Card */}
-      <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+    <div
+      style={{
+        width: "100%",
+        height: "400px",
+        background: "linear-gradient(to bottom, #ffffff, #f5f5f5)",
+        borderRadius: "12px",
+        overflow: "hidden",
+        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)",
+        border: "1px solid rgba(0, 0, 0, 0.07)",
+      }}
+    >
+      <Canvas camera={{ position: [0, 2, 12], fov: 60 }}>
+        <AnimatedCamera />
+        <OrbitControls
+          enablePan
+          enableZoom
+          enableRotate
+          minDistance={3}
+          maxDistance={20}
+        />
+
+        <ambientLight intensity={0.7} />
+        <pointLight position={[10, 10, 10]} intensity={0.6} />
+        <pointLight position={[-10, -10, -10]} intensity={0.4} />
+
+        {/* Axis Helper (optional for debugging) */}
+        {/* <axesHelper args={[5]} /> */}
+
+        <ChartPoints
+          data={data}
+          labels={labels}
+          minValue={minValue}
+          maxValue={maxValue}
+          scale={scale}
+        />
+
+        {/* Grid Base */}
+        <gridHelper args={[10, 20]} position={[0, -2.5, 0]} />
+      </Canvas>
+    </div>
+  );
+};
+
+
+
+
+// plugins: [watermarkPlugin]
+const renderChart = () => {
+  console.log("📊 Rendering chart with data:", chartData);
+
+  if (
+    !chartData ||
+    !chartData.labels ||
+    !chartData.datasets ||
+    chartData.labels.length === 0 ||
+    chartData.datasets.length === 0
+  ) {
+    return <div className="text-gray-500 text-center">No data to display.</div>;
+  }
+
+  // 1. Get canvas context for gradient
+  const canvas = chartRef.current?.canvas || chartRef.current;
+  const ctx = canvas?.getContext("2d");
+  let gradient = null;
+  if (ctx && (chartStyle === "line" || chartStyle === "bar")) {
+    gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, "#4f46e5");
+    gradient.addColorStop(1, "#a78bfa");
+  }
+
+  // 2. Responsive font sizing
+  const isMobile = window.innerWidth < 768;
+  const titleFontSize = isMobile ? 16 : 20;
+  const labelFontSize = isMobile ? 12 : 14;
+
+  // 3. Chart options (animations, interactivity, tooltips, legend, scales)
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 1000, easing: "easeOutQuart" },
+    interaction: { mode: "index", intersect: false },
+    hover: { mode: "nearest", intersect: true },
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          usePointStyle: true,
+          boxWidth: 8,
+          padding: 12,
+          color: "#4B5563",
+          font: { size: labelFontSize, weight: "bold" },
+        },
+      },
+      font: {
+        size: 14,
+        weight: "bold",
+        color: isDarkMode ? "#F3F4F6" : "#4B5563",
+      },
+      title: {
+        display: true,
+        text: `${selectedYAxis} vs ${selectedXAxis}`,
+        font: { size: titleFontSize, weight: "bold" },
+        color: "#1F2937",
+      },
+      tooltip: {
+        backgroundColor: "#111827",
+        titleColor: "#f9fafb",
+        bodyColor: "#f9fafb",
+        borderColor: "#6B7280",
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 8,
+        usePointStyle: true,
+        callbacks: {
+          label: (ctx) => `${ctx.dataset.label}: ${ctx.formattedValue}`,
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: { color: "#6B7280", font: { size: 12 } },
+        grid: { color: "#E5E7EB" },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { color: "#6B7280", font: { size: 12 } },
+        grid: { color: "#E5E7EB" },
+      },
+    },
+  };
+
+  // 4. Color palette
+  const palette = [
+    "#6366F1", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981",
+    "#3B82F6", "#F43F5E", "#A855F7", "#22D3EE", "#84CC16"
+  ];
+
+  // 5. Trim pie chart to max 10 entries
+  let adjustedChartData = chartData;
+  if (chartStyle === "pie" && chartData.labels.length > 10) {
+    adjustedChartData = {
+      labels: chartData.labels.slice(0, 10),
+      datasets: chartData.datasets.map(ds => ({
+        ...ds,
+        data: ds.data.slice(0, 10),
+      })),
+    };
+  }
+
+  // 6. Styled dataset
+  const styledData = {
+    ...adjustedChartData,
+    datasets: adjustedChartData.datasets.map((ds, i) => {
+      const baseColor = palette[i % palette.length];
+      const isPie = chartStyle === "pie";
+      const isLine = chartStyle === "line";
+      const isBar = chartStyle === "bar";
+
+      if (isPie) {
+        console.log("🧁 Pie slice colors:", ds.data.map((_, j) => palette[j % palette.length]));
+      }
+
+      return {
+        ...ds,
+        ...(isPie && {
+          backgroundColor: ds.data.map((_, j) => palette[j % palette.length]),
+          borderColor: "#fff",
+          borderWidth: 2,
+          hoverOffset: 10,
+        }),
+        ...(isLine && {
+          backgroundColor: gradient || `${baseColor}33`,
+          borderColor: baseColor,
+          borderWidth: 3,
+          pointBackgroundColor: "#fff",
+          pointBorderColor: baseColor,
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 9,
+          pointHoverBackgroundColor: baseColor,
+          pointHoverBorderColor: "#fff",
+          fill: true,
+          tension: 0.4,
+        }),
+        ...(isBar && {
+          backgroundColor: gradient || baseColor,
+          borderColor: baseColor,
+          borderWidth: 2,
+        }),
+      };
+    }),
+  };
+
+  console.log("🎨 Styled Data:", styledData);
+
+  // 7. 3D fallback
+ if (chartType === "3d") return render3DChart();
+
+
+  const commonProps = {
+    data: styledData,
+    options: chartOptions,
+    plugins: showWatermark ? [watermarkPlugin] : [],
+  };
+
+  // 8. Final Chart Render
+  return (
+    <motion.div
+      key={`${selectedXAxis}-${selectedYAxis}-${chartStyle}`}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="w-full h-full bg-white p-4 rounded-xl shadow-md transition ease-in-out flex items-center justify-center"
+    >
+
+      {chartType === "2d" && (
+  <>
+    {chartStyle === "line" && <ChartLine {...commonProps} />}
+    {chartStyle === "bar" && <Bar {...commonProps} />}
+    {chartStyle === "pie" && <Pie {...commonProps} />}
+  </>
+)}
+    </motion.div>
+  );
+};
+
+
+{uploading ? (
+  <Skeleton className="w-full h-[400px] rounded-xl" />
+) : (
+  renderChart()
+)}
+
+//   const render3DChart = () => {
+//   if (!chartData) return null;
+
+//   const data = chartData?.datasets?.[0]?.data || [];
+//   const labels = chartData?.labels || [];
+
+//   const maxValue = Math.max(...data);
+//   const minValue = Math.min(...data);
+//   const range = maxValue - minValue;
+//   const scale = range === 0 ? 1 : 5 / range;
+
+//   return (
+//     <div className="w-full h-[400px] rounded-2xl overflow-hidden shadow-md border border-black/10 bg-gradient-to-br from-slate-50 to-slate-200">
+//       <Canvas camera={{ position: [0, 2, 10], fov: 60 }} style={{ background: "transparent" }}>
+//         <OrbitControls
+//           enablePan={true}
+//           enableZoom={true}
+//           enableRotate={true}
+//           minDistance={3}
+//           maxDistance={20}
+//         />
+//         <ambientLight intensity={0.6} />
+//         <pointLight position={[10, 10, 10]} intensity={0.6} />
+//         <pointLight position={[-10, -10, -10]} intensity={0.3} />
+//         <ChartPoints data={data} labels={labels} minValue={minValue} maxValue={maxValue} scale={scale} />
+//         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
+//           <planeGeometry args={[100, 100]} />
+//           <meshStandardMaterial color="#e5e7eb" />
+//         </mesh>
+//       </Canvas>
+//     </div>
+//   );
+// };
+
+
+  const selectOptions =
+  completeData?.headers?.map((header) => ({
+    value: header,
+    label: header,
+  })) || [];
+
+
+  return (
+  <DashboardLayout>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 mb-8">
+      {/* File Upload Section */}
+      <div className="bg-white p-6 rounded-2xl shadow-md mb-6">
+        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700 mb-4">
           Excel Analytics
-        </Typography>
+        </h1>
 
         {loading && (
-          <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-            <CircularProgress />
-          </Box>
+          <div className="flex justify-center my-6">
+            <CircularProgress sx={{ color: "#4f46e5" }} />
+          </div>
         )}
 
-        <Typography variant="body1" paragraph>
-          Upload your Excel files for analysis. We support .xlsx and .xls
-          formats.
-        </Typography>
+        <p className="text-slate-500 mb-4">
+          Upload your Excel files for analysis. We support .xlsx and .xls formats.
+        </p>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                border: "2px dashed #ccc",
-                borderRadius: 2,
-                p: 3,
-                textAlign: "center",
-                mb: 2,
-              }}
+        <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center bg-gradient-to-br from-slate-50 to-slate-200 mb-4">
+          <StyledButton
+            component="label"
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+            disabled={uploading}
+            sx={{
+              background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
+              },
+            }}
+          >
+            Choose Excel File
+            <VisuallyHiddenInput
+              id="file-upload"
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileChange}
+            />
+          </StyledButton>
+
+          {file && (
+            <p className="text-sm text-slate-500 mt-3">Selected file: {file.name}</p>
+          )}
+        </div>
+
+        {error && !success && (
+  <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+    {error}
+  </div>
+)}
+
+{success && !error && (
+  <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4">
+    {success}
+  </div>
+)}
+
+
+        {uploadedFile && (
+          <div className="bg-blue-100 text-blue-700 p-3 rounded-lg mb-4">
+            File uploaded successfully!{" "}
+            <a
+              href={uploadedFile.cloudinaryUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-600 underline"
             >
-              <Button
-                component="label"
-                variant="contained"
-                startIcon={<CloudUploadIcon />}
-                disabled={uploading}
-              >
-                Choose Excel File
-                <VisuallyHiddenInput
-                  id="file-upload"
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleFileChange}
-                />
-              </Button>
+              View File
+            </a>
+          </div>
+        )}
 
-              {file && (
-                <Typography variant="body2" sx={{ mt: 2 }}>
-                  Selected file: {file.name}
-                </Typography>
-              )}
-            </Box>
+        {/* Preview Table */}
+        {previewData && (
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold text-slate-800 mb-1">File Preview</h2>
+            <p className="text-sm text-slate-500 mb-3">
+              Total Rows: {previewData.totalRows} | Total Columns: {previewData.totalColumns}
+            </p>
 
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
-
-            {success && (
-              <Alert severity="success" sx={{ mb: 2 }}>
-                {success}
-              </Alert>
-            )}
-
-            {uploadedFile && (
-              <Alert severity="info" sx={{ mb: 2 }}>
-                File uploaded successfully!{" "}
-                <Link href={uploadedFile.cloudinaryUrl} target="_blank">
-                  View File
-                </Link>
-              </Alert>
-            )}
-
-            {/* Preview in main card (before upload) */}
-            {previewData && (
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  File Preview
-                </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Total Rows: {previewData.totalRows} | Total Columns:{" "}
-                  {previewData.totalColumns}
-                </Typography>
-                <TableContainer
-                  component={Paper}
-                  sx={{ maxHeight: 400, overflow: "auto" }}
-                >
-                  <Table stickyHeader size="small">
-                    <TableHead>
-                      <TableRow>
-                        {previewData.headers.map((header, index) => (
-                          <TableCell key={index} sx={{ fontWeight: "bold" }}>
-                            {header}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {previewData.rows.map((row, rowIndex) => (
-                        <TableRow key={rowIndex}>
-                          {previewData.headers.map((_, colIndex) => (
-                            <TableCell key={colIndex}>
-                              {row[colIndex] || ""}
-                            </TableCell>
-                          ))}
-                        </TableRow>
+            <div className="overflow-auto max-h-[400px] rounded-2xl shadow">
+              <table className="min-w-full text-sm text-left text-slate-700">
+                <thead className="bg-gradient-to-br from-slate-50 to-slate-200 text-slate-800 font-bold">
+                  <tr>
+                    {previewData.headers.map((header, index) => (
+                      <th key={index} className="px-4 py-2">{header}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {previewData.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex} className="even:bg-slate-50">
+                      {previewData.headers.map((_, colIndex) => (
+                        <td key={colIndex} className="px-4 py-2 text-slate-600">
+                          {row[colIndex] || ""}
+                        </td>
                       ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: 1, display: "block" }}
-                >
-                  Showing first 5 rows of {previewData.totalRows} total rows
-                </Typography>
-              </Box>
-            )}
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleUpload}
-              disabled={!file || uploading}
-              sx={{ mt: 2 }}
-            >
-              {uploading ? (
-                <>
-                  <CircularProgress size={24} sx={{ mr: 1 }} />
-                  Uploading...
-                </>
-              ) : (
-                "Upload File"
-              )}
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Chart Configuration Card */}
-      {completeData && (
-        <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            Chart Configuration
-          </Typography>
-          <Typography variant="body1" paragraph>
-            Select columns to visualize your data. Choose one column for the
-            X-axis and one for the Y-axis.
-          </Typography>
-
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel id="x-axis-label">X-Axis Column</InputLabel>
-                <Select
-                  labelId="x-axis-label"
-                  id="x-axis-select"
-                  value={selectedXAxis}
-                  label="X-Axis Column"
-                  onChange={handleXAxisChange}
-                >
-                  {completeData.headers.map((header, index) => (
-                    <MenuItem key={index} value={header}>
-                      {header}
-                    </MenuItem>
+                    </tr>
                   ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
-                <InputLabel id="y-axis-label">Y-Axis Column</InputLabel>
-                <Select
-                  labelId="y-axis-label"
-                  id="y-axis-select"
-                  value={selectedYAxis}
-                  label="Y-Axis Column"
-                  onChange={handleYAxisChange}
-                >
-                  {completeData.headers.map((header, index) => (
-                    <MenuItem key={index} value={header}>
-                      {header}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Showing first 5 rows of {previewData.totalRows} total rows
+            </p>
+          </div>
+        )}
 
-          <Box sx={{ mt: 3, mb: 3 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Chart Type
-            </Typography>
-            <ToggleButtonGroup
-              value={chartType}
-              exclusive
-              onChange={handleChartTypeChange}
-              aria-label="chart type"
-              sx={{ mb: 2 }}
-            >
-              <ToggleButton value="2d" aria-label="2d chart">
-                2D
-              </ToggleButton>
-              <ToggleButton value="3d" aria-label="3d chart">
-                3D
-              </ToggleButton>
-            </ToggleButtonGroup>
+        <StyledButton
+          variant="contained"
+          onClick={handleUpload}
+          disabled={!file || uploading}
+          sx={{
+            marginTop: "1rem",
+            background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+            "&:hover": {
+              background: "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
+            },
+          }}
+        >
+          {uploading ? (
+            <>
+              <CircularProgress size={24} sx={{ mr: 1, color: "#ffffff" }} />
+              Uploading...
+            </>
+          ) : (
+            "Upload File"
+          )}
+        </StyledButton>
+      </div>
 
-            {!is3D && (
-              <>
-                <Typography variant="subtitle1" gutterBottom>
-                  Chart Style
-                </Typography>
-                <ToggleButtonGroup
-                  value={chartStyle}
-                  exclusive
-                  onChange={handleChartStyleChange}
-                  aria-label="chart style"
-                >
-                  <ToggleButton value="line" aria-label="line chart">
-                    Line
-                  </ToggleButton>
-                  <ToggleButton value="bar" aria-label="bar chart">
-                    Bar
-                  </ToggleButton>
-                  <ToggleButton value="pie" aria-label="pie chart">
-                    Pie
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </>
-            )}
-          </Box>
+      {/* Chart Configuration */}
+      {completeData?.headers && showChartConfig && (
+  <div className="bg-white p-6 rounded-2xl shadow-md mb-6">
+    <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700 mb-2">
+      Chart Configuration
+    </h2>
 
-          <Box sx={{ mt: 3, textAlign: "center" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={!selectedXAxis || !selectedYAxis}
-              onClick={generateChartData}
-            >
-              Generate Chart
-            </Button>
-          </Box>
-        </Paper>
-      )}
+    <p className="text-slate-500 mb-4">
+      Select columns to visualize your data. Choose one column for the X-axis and one for the Y-axis.
+    </p>
 
-      {/* Chart Display Card */}
-      {chartData && (
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Box
+   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+  {/* X-axis Select */}
+  <div>
+    <label className="block text-slate-600 mb-1">X-Axis Column</label>
+    <ReactSelect
+      options={selectOptions}
+      value={selectOptions.find((opt) => opt.value === selectedXAxis)}
+      onChange={(selectedOption) => setSelectedXAxis(selectedOption.value)}
+      className="react-select-container text-sm"
+      classNamePrefix="react-select"
+      styles={{
+        control: (base) => ({
+          ...base,
+          cursor: "pointer",
+        }),
+        option: (base, state) => ({
+          ...base,
+          cursor: "pointer",
+          backgroundColor: state.isFocused ? "#eef2ff" : "white",
+          color: "black",
+        }),
+      }}
+    />
+  </div>
+
+  {/* Y-axis Select */}
+  <div>
+    <label className="block text-slate-600 mb-1">Y-Axis Column</label>
+    <ReactSelect
+      options={selectOptions}
+      value={selectOptions.find((opt) => opt.value === selectedYAxis)}
+      onChange={(selectedOption) => setSelectedYAxis(selectedOption.value)}
+      className="react-select-container text-sm"
+      classNamePrefix="react-select"
+      styles={{
+        control: (base) => ({
+          ...base,
+          cursor: "pointer",
+        }),
+        option: (base, state) => ({
+          ...base,
+          cursor: "pointer",
+          backgroundColor: state.isFocused ? "#eef2ff" : "white",
+          color: "black",
+        }),
+      }}
+    />
+  </div>
+</div>
+
+
+
+    <div className="mb-6">
+      <h3 className="text-slate-800 font-medium mb-2">Chart Type</h3>
+      <div className="flex gap-4">
+        {["2d", "3d"].map((type) => (
+          <button
+            key={type}
+            onClick={() => setChartType(type)}
+            className={`px-4 py-2 rounded-lg border cursor-pointer transition-all duration-200 ${
+              chartType === type
+                ? "bg-gradient-to-r from-indigo-600 to-purple-700 text-white"
+                : "text-slate-500 border-slate-200"
+            }`}
+          >
+            {type.toUpperCase()}
+          </button>
+        ))}
+      </div>
+    </div>
+
+{chartType === "2d" && (
+  <div className="mb-6">
+    <h3 className="text-slate-800 font-medium mb-2">Chart Style</h3>
+    <div className="flex gap-4">
+      {["line", "bar", "pie"].map((style) => (
+        <button
+          key={style}
+          onClick={() => setChartStyle(style)}
+          className={`px-4 py-2 rounded-lg border cursor-pointer transition-all duration-200 ${
+            chartStyle === style
+              ? "bg-gradient-to-r from-indigo-600 to-purple-700 text-white"
+              : "text-slate-500 border-slate-200"
+          }`}
+        >
+          {style.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
+
+
+    <div className="text-center">
+      <StyledButton
+        variant="contained"
+        disabled={!selectedXAxis || !selectedYAxis}
+        onClick={generateChartData}
+        sx={{
+          background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+          "&:hover": {
+            background: "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
+          },
+        }}
+      >
+        Generate Chart
+      </StyledButton>
+    </div>
+  </div>
+)}
+
+
+      {/* Chart Display Section */}
+     {chartData && (
+  <div className="bg-white p-6 rounded-2xl shadow-md mb-10">
+    {/* Header Section */}
+    <div className="flex justify-between items-center mb-4">
+      <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700">
+        Chart Visualization
+      </h2>
+
+      {/* Download Icon */}
+      {chartType === "2d" && (
+        <div>
+          <IconButton
+            onClick={handleDownloadClick}
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
+              color: "#4f46e5",
+              "&:hover": { background: "rgba(79, 70, 229, 0.1)" },
+            }}
+            disabled={uploading}
+          >
+            {uploading ? (
+              <CircularProgress size={24} sx={{ color: "#4f46e5" }} />
+            ) : (
+              <DownloadIcon />
+            )}
+          </IconButton>
+
+          {/* Download Menu */}
+          <Menu
+            anchorEl={downloadAnchorEl}
+            open={Boolean(downloadAnchorEl)}
+            onClose={handleDownloadClose}
+            PaperProps={{
+              sx: {
+                borderRadius: "8px",
+                boxShadow:
+                  "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+              },
             }}
           >
-            <Typography variant="h5" gutterBottom>
-              Chart Visualization
-            </Typography>
-            {!is3D && (
-              <Box>
-                <IconButton
-                  onClick={handleDownloadClick}
-                  color="primary"
-                  aria-label="download chart"
-                  disabled={uploading}
-                >
-                  {uploading ? (
-                    <CircularProgress size={24} />
-                  ) : (
-                    <DownloadIcon />
-                  )}
-                </IconButton>
-                <Menu
-                  anchorEl={downloadAnchorEl}
-                  open={Boolean(downloadAnchorEl)}
-                  onClose={handleDownloadClose}
-                >
-                  <MenuItem onClick={downloadAsPNG} disabled={uploading}>
-                    Download as PNG
-                  </MenuItem>
-                  <MenuItem onClick={downloadAsPDF} disabled={uploading}>
-                    Download as PDF
-                  </MenuItem>
-                </Menu>
-              </Box>
-            )}
-          </Box>
-          <Box
-            ref={chartContainerRef}
-            sx={{
-              height: "400px",
-              width: "100%",
-              backgroundColor: "#ffffff",
-              padding: "20px",
-              borderRadius: "4px",
-            }}
-          >
-            {renderChart()}
-          </Box>
-        </Paper>
+            <MenuItem onClick={downloadAsPNG} disabled={uploading}>
+              Download as PNG
+            </MenuItem>
+            <MenuItem onClick={downloadAsPDF} disabled={uploading}>
+              Download as PDF
+            </MenuItem>
+          </Menu>
+        </div>
       )}
-    </Container>
-  );
+    </div>
+
+    {/* ✅ Custom Filename Input */}
+    {chartType === "2d" && (
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Custom Filename
+      </label>
+      <input
+        type="text"
+        value={customFilename}
+        onChange={(e) => setCustomFilename(e.target.value)}
+        placeholder="Enter filename"
+        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+    </div>
+    )}
+
+    {/* ✅ Chart Container */}
+    <div
+      ref={chartContainerRef}
+      className="w-full h-[70vh] md:h-[70vh] bg-white p-6 rounded-2xl shadow-inner flex items-center justify-center"
+    >
+      
+      {renderChart()}
+    </div>
+  </div>
+)}
+    </div>
+  </DashboardLayout>
+);
+
 };
 
 export default ExcelAnalytics;
