@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const publicEndpoints = ["/auth/login", "/auth/register", "/auth/google"];
+  const publicEndpoints = ["/auth/google/login", "/auth/google/register", "/auth/google"];
   const isPublicEndpoint = publicEndpoints.some((endpoint) =>
     config.url.includes(endpoint)
   );

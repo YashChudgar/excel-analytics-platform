@@ -92,7 +92,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-const googleLogin = async (req, res) => {
+const googleLoginHandler = async (req, res, mode) => {
   try {
     const { token } = req.body;
     const ticket = await client.verifyIdToken({
@@ -103,33 +103,82 @@ const googleLogin = async (req, res) => {
     const payload = ticket.getPayload();
     const { sub, email, name, picture } = payload;
 
-    let user = await User.findOne({ email });
+    const existingUser = await User.findOne({ email });
 
-    if (!user) {
+    if (mode === "login") {
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not registered. Please sign up first." });
+      }
+    }
+
+    if (mode === "register") {
+      if (existingUser) {
+        return res.status(400).json({ message: "User already registered. Please login." });
+      }
+
       const generatedUsername = email.split('@')[0] + Math.floor(Math.random() * 1000);
 
-      user = await User.create({
+      const newUser = await User.create({
         username: generatedUsername,
-        name,
         email,
         profilePic: picture,
         googleId: sub,
-        password: Math.random().toString(36).slice(-8), // placeholder password
+        password: Math.random().toString(36).slice(-8), // dummy
       });
+
+      const tokenJWT = generateToken(newUser._id);
+      return res.status(201).json({ user: formatUser(newUser), token: tokenJWT });
     }
 
-    // Create JWT
-    const tokenJWT = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
-    res.status(200).json({ user, token: tokenJWT });
+    // mode === "login", and user exists
+    const tokenJWT = generateToken(existingUser._id);
+    return res.status(200).json({ user: formatUser(existingUser), token: tokenJWT });
 
   } catch (err) {
-    console.error("Google login error:", err);
-    res.status(401).json({ message: "Google login failed" });
+    console.error("Google auth error:", err);
+    res.status(500).json({ message: "Google authentication failed" });
   }
 };
+const googleLogin = (req, res) => googleLoginHandler(req, res, "login");
+const googleRegister = (req, res) => googleLoginHandler(req, res, "register");
+// const googleLogin = async (req, res) => {
+//   try {
+//     const { token } = req.body;
+//     const ticket = await client.verifyIdToken({
+//       idToken: token,
+//       audience: process.env.GOOGLE_CLIENT_ID,
+//     });
+
+//     const payload = ticket.getPayload();
+//     const { sub, email, name, picture } = payload;
+
+//     let user = await User.findOne({ email });
+
+//     if (!user) {
+//       const generatedUsername = email.split('@')[0] + Math.floor(Math.random() * 1000);
+
+//       user = await User.create({
+//         username: generatedUsername,
+//         name,
+//         email,
+//         profilePic: picture,
+//         googleId: sub,
+//         password: Math.random().toString(36).slice(-8), // placeholder password
+//       });
+//     }
+
+//     // Create JWT
+//     const tokenJWT = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: "7d",
+//     });
+
+//     res.status(200).json({ user, token: tokenJWT });
+
+//   } catch (err) {
+//     console.error("Google login error:", err);
+//     res.status(401).json({ message: "Google login failed" });
+//   }
+// };
 
 const checkUserExists = async (req, res) => {
   const { email } = req.body;
@@ -175,4 +224,4 @@ const resetPasswordDirect = async (req, res) => {
 
 
 
-module.exports = { register, login, getProfile, updateProfile, googleLogin, checkUserExists, resetPasswordDirect };
+module.exports = { register, login, getProfile, updateProfile, googleLogin, checkUserExists, resetPasswordDirect, googleRegister };
