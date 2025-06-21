@@ -7,9 +7,10 @@ const path = require("path");
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const uploadRoutes = require("./routes/uploadRoutes");
-const userRoutes = require("./routes/user");
+const userRoutes = require("./routes/userRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 const app = express();
 app.use(cors());
@@ -45,6 +46,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/chat", chatRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
@@ -67,16 +67,54 @@ const Navbar = () => {
   const loggedInNavItems = [{ label: "Dashboard", path: "/dashboard" }];
 
   const isAdminDashboard = location.pathname === "/admin-dashboard";
+  
+  const [showNavbar, setShowNavbar] = useState(true);
+const [lastScrollY, setLastScrollY] = useState(0);
+
+useEffect(() => {
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/register";
+
+  if (!isAuthPage) {
+    setShowNavbar(true); // always show navbar on other pages
+    return;
+  }
+
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY < 10) {
+      setShowNavbar(true);
+    } else if (currentScrollY > lastScrollY) {
+      setShowNavbar(false); // scroll down
+    } else {
+      setShowNavbar(true); // scroll up
+    }
+
+    setLastScrollY(currentScrollY);
+  };
+
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, [lastScrollY]);
 
   return (
     <AppBar
-      position="sticky"
+      position="fixed"
       elevation={0}
       sx={{
-        background: "rgba(255, 255, 255, 0.8)",
-        backdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
-      }}
+  top: 0,
+  left: 0,
+  right: 0,
+  transform:
+    location.pathname === "/login" || location.pathname === "/register"
+      ? (showNavbar ? "translateY(0%)" : "translateY(-100%)")
+      : "translateY(0%)",
+  transition: "transform 0.3s ease-in-out",
+  background: "rgba(255, 255, 255, 0.8)",
+  backdropFilter: "blur(20px)",
+  borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
+  zIndex: 1201,
+}}
     >
       <Container maxWidth="xl">
         <Toolbar
@@ -117,7 +155,8 @@ const Navbar = () => {
           </Box>
 
           {/* Mobile menu */}
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+          
+          {/* <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
               aria-label="menu"
@@ -179,7 +218,7 @@ const Navbar = () => {
                   </MenuItem>
                 ))}
             </Menu>
-          </Box>
+          </Box> */}
 
           {/* Logo for mobile */}
           <Box
@@ -310,19 +349,21 @@ const Navbar = () => {
                   <Button
                     key="logout-button"
                     onClick={handleLogout}
-                    variant="outlined"
+                    variant="contained"
                     sx={{
-                      px: 2,
-                      py: 0.5,
-                      borderRadius: 1,
-                      fontSize: "0.8rem",
-                      textTransform: "none",
-                      color: "#3730a3",
-                      borderColor: "#3730a3",
-                      "&:hover": {
-                        borderColor: "#3730a3",
-                        backgroundColor: "rgba(55, 48, 163, 0.08)",
-                      },
+                       display: { xs: "none", sm: "block" },
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1,
+                  background:
+                    "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+                  fontWeight: 500,
+                  boxShadow: "0 4px 14px rgba(79, 70, 229, 0.25)",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
+                    boxShadow: "0 6px 20px rgba(79, 70, 229, 0.35)",
+                  },
                     }}
                   >
                     Logout
@@ -347,7 +388,7 @@ const Navbar = () => {
                   },
                 }}
               >
-                Sign In
+                Log In
               </Button>
               <Button
                 variant="contained"
@@ -368,7 +409,7 @@ const Navbar = () => {
                   },
                 }}
               >
-                Sign Up
+                Register
               </Button>
             </Box>
           )}
