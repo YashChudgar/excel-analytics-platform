@@ -24,6 +24,7 @@ import Profile from "./pages/Profile";
 import About from './pages/About';
 import Careers from './pages/Careers';
 import Contact from './pages/Contact';
+import History from "./pages/History";
 
 // Components & routes
 import Unauthorized from "./components/Unauthorized";
@@ -63,8 +64,9 @@ function App() {
                 <Route path="/dashboard" element={<RoleBasedDashboard />} />
                 <Route path="/user-route" element={<UserRoute />} />
                 <Route path="/excel-analytics" element={<ExcelAnalytics />} />
-                <Route path="/admin/users" element={<UserManagement /> } />
+                <Route path="/admin/users" element={<UserManagement />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/history" element={<History />} />
               </Route>
 
               {/* Admin-only routes */}
@@ -77,8 +79,8 @@ function App() {
             </Routes>
           </Box>
         </Box>
-      <ToastContainer position="top-right" autoClose={3000} />
-    </Router>
+        <ToastContainer position="top-right" autoClose={3000} />
+      </Router>
     </ThemeProvider>
   );
 }
