@@ -108,11 +108,13 @@ const Dashboard = () => {
       title: "Data Analysis",
       description: "Analyze your Excel data with powerful tools",
       icon: <AnalyticsIcon className="text-indigo-400 w-10 h-10" />,
+      onClick: () => navigate("/excel-analytics"),
     },
     {
       title: "Visualizations",
       description: "Create beautiful charts and graphs",
       icon: <BarChartIcon className="text-indigo-400 w-10 h-10" />,
+      onClick: () => navigate("/excel-analytics"),
     },
   ];
 

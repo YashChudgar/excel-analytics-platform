@@ -90,12 +90,13 @@ const DashboardLayout = ({ children }) => {
                 background: location.pathname === item.path ? "#fff" : "none",
                 fontWeight: location.pathname === item.path ? 700 : 500,
                 color: location.pathname === item.path ? "#4f46e5" : "#fff",
+                cursor: "pointer",
                 "&:hover": {
                   background:
                     location.pathname === item.path
                       ? "#fff"
                       : "rgba(255,255,255,0.10)",
-                  color: "#4f46e5",
+                  color: "#000",
                 },
                 transition: "background 0.2s, color 0.2s",
                 minHeight: 44,
@@ -132,7 +133,6 @@ const DashboardLayout = ({ children }) => {
         {children}
       </Box>
     </Box>
->>>>>>> 4c00c9f4307272ff69c0f00a25828f70bd0b65f9
   );
 };
 
