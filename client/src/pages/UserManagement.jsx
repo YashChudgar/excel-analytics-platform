@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PencilSquareIcon,
@@ -8,6 +8,7 @@ import {
   EnvelopeIcon,
   CalendarDaysIcon,
 } from "@heroicons/react/24/solid";
+import DashboardLayout from "../components/DashboardLayout";
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -34,7 +35,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/admin/users", {
+      const res = await axiosInstance.get("/admin/users", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setUsers(res.data.users);
@@ -60,7 +61,7 @@ const UserManagement = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/admin/users/${userToDelete._id}`, {
+      await axiosInstance.delete(`/admin/users/${userToDelete._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setSuccess("User deleted successfully");
@@ -75,11 +76,13 @@ const UserManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.patch(
-        `http://localhost:5000/api/admin/users/${selectedUser._id}`,
-        formData,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
+      await axiosInstance.put(
+        `/admin/users/${selectedUser._id}`,
+        {
+        username: formData.username,
+        email: formData.email,
+        role: "user", // 🔐 Force role to 'user'
+      });
       setSuccess("User updated successfully");
       setOpenDialog(false);
       fetchUsers();
@@ -104,7 +107,8 @@ const UserManagement = () => {
   );
 
   return (
-      <div className="max-w-7xl mx-auto p-4 pt-22">
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto p-4 pt-0">
         <motion.div {...fadeIn}>
           <h1 className="text-3xl font-bold text-gray-800 mb-1">User Management</h1>
           <p className="text-gray-500 mb-6">Monitor and manage all users within the platform.</p>
@@ -150,7 +154,7 @@ const UserManagement = () => {
                         </span>
                       </td>
                       <td className="p-4 space-x-2">
-                        <button onClick={() => handleEdit(user)} className="text-blue-500 hover:text-blue-700">
+                        <button onClick={() => handleEdit(user)} className="cursor-pointer text-blue-500 hover:text-blue-700">
                           <PencilSquareIcon className="w-5 h-5" />
                         </button>
                         <button
@@ -158,7 +162,7 @@ const UserManagement = () => {
                             setUserToDelete(user);
                             setOpenDeleteDialog(true);
                           }}
-                          className="text-red-500 hover:text-red-700"
+                          className="cursor-pointer text-red-500 hover:text-red-700"
                         >
                           <TrashIcon className="w-5 h-5" />
                         </button>
@@ -173,77 +177,104 @@ const UserManagement = () => {
 
         {/* Edit Dialog */}
         <AnimatePresence>
-          {openDialog && (
-            <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div
-                className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full"
-                initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}
-              >
-                <h2 className="text-xl font-semibold mb-4">Edit User</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full p-2 border rounded"
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                  <div className="flex justify-end space-x-2">
-                    <button onClick={() => setOpenDialog(false)} type="button" className="px-4 py-2 rounded bg-gray-200">
-                      Cancel
-                    </button>
-                    <button type="submit" className="px-4 py-2 rounded bg-indigo-600 text-white">
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+  {openDialog && (
+    <motion.div
+      className="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-white max-w-md w-full rounded-2xl shadow-2xl p-6 space-y-4 max-h-screen overflow-y-auto"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.9 }}
+      >
+        <h2 className="text-xl font-bold mb-2 text-indigo-700">Edit User</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-text"
+            required
+          />
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-text"
+            required
+          />
+          <select
+            value={formData.role}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+          <div className="flex justify-end space-x-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setOpenDialog(false)}
+              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition cursor-pointer"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
         {/* Delete Dialog */}
         <AnimatePresence>
-          {openDeleteDialog && (
-            <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div
-                className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full"
-                initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}
-              >
-                <h2 className="text-xl font-semibold mb-4 text-red-600">Confirm Deletion</h2>
-                <p className="mb-4">
-                  Are you sure you want to delete <strong>{userToDelete?.username}</strong>?
-                </p>
-                <div className="flex justify-end space-x-2">
-                  <button onClick={() => setOpenDeleteDialog(false)} className="px-4 py-2 rounded bg-gray-200">
-                    Cancel
-                  </button>
-                  <button onClick={handleDelete} className="px-4 py-2 rounded bg-red-600 text-white">
-                    Delete
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+  {openDeleteDialog && (
+    <motion.div
+      className="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-white max-w-md w-full rounded-2xl shadow-2xl p-6 space-y-4 max-h-screen overflow-y-auto"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.9 }}
+      >
+        <h2 className="text-xl font-bold text-red-600 mb-2">Confirm Deletion</h2>
+        <p className="text-gray-700">
+          Are you sure you want to delete <strong>{userToDelete?.username}</strong>?
+        </p>
+        <div className="flex justify-end space-x-2 pt-2">
+          <button
+            onClick={() => setOpenDeleteDialog(false)}
+            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
+          >
+            Delete
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
       </div>
+      </DashboardLayout>
   );
 };
 

@@ -20,6 +20,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import DashboardLayout from "../components/DashboardLayout";
 
 const AdminDashboard = () => {
   const user = useSelector((state) => state.auth.user);
@@ -90,7 +91,8 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pt-22">
+    <DashboardLayout>
+    <div className="max-w-7xl mx-auto px-4 py-6 pt-0">
       <motion.div
         className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-6 rounded-xl shadow-lg mb-6"
         initial={{ opacity: 0, y: 20 }}
@@ -230,6 +232,7 @@ const AdminDashboard = () => {
         </>
       )}
     </div>
+    </DashboardLayout>
   );
 };
 

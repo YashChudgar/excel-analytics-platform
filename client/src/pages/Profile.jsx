@@ -200,9 +200,19 @@ const Profile = () => {
 
   return (
     <DashboardLayout>
-      <Box sx={{ maxWidth: "lg", mx: "auto", p: 3 }}>
+      <Box sx={{ maxWidth: "lg", mx: "auto", p: 3, pt:0 }}>
         {/* Header Section */}
-        <Box
+        <div className="bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-2xl p-6 mb-8 text-white text-center">
+  <div className="w-20 h-20 mx-auto mb-3 rounded-full bg-white/20 flex items-center justify-center text-3xl font-semibold">
+    {user?.username?.charAt(0)?.toUpperCase() || "U"}
+  </div>
+  <h2 className="text-2xl font-bold">{user?.username || "User"}</h2>
+  <p className="text-white/90">{user?.email || "user@example.com"}</p>
+  <span className="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full font-semibold text-sm">
+    {user?.role || "User"}
+  </span>
+</div>
+        {/* <Box
           sx={{
             background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
             borderRadius: 4,
@@ -239,17 +249,46 @@ const Profile = () => {
               fontWeight: "bold",
             }}
           />
-        </Box>
+        </Box> */}
 
         {/* Stats Section */}
-        <Typography
+        <h3 className="text-2xl font-bold text-slate-800 mb-6">Your Analytics Overview</h3>
+
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+  <StatCard
+    icon={<CloudUploadIcon className="text-4xl" />}
+    title="Total Files"
+    value={userStats?.totalFiles || 0}
+    color="#4f46e5"
+    loading={statsLoading}
+  />
+  <StatCard
+    icon={<AnalyticsIcon className="text-4xl" />}
+    title="Total Analyses"
+    value={userStats?.totalAnalyses || 0}
+    color="#10b981"
+    loading={statsLoading}
+  />
+  <StatCard
+    icon={<ScheduleIcon className="text-4xl" />}
+    title="Last Active"
+    value={
+      userStats?.lastActive
+        ? format(new Date(userStats.lastActive), "MMM d")
+        : "Today"
+    }
+    color="#f59e0b"
+    loading={statsLoading}
+  />
+</div>
+
+        {/* <Typography
           variant="h5"
           sx={{ fontWeight: "bold", mb: 3, color: "#1e293b" }}
         >
           Your Analytics Overview
-        </Typography>
-
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        </Typography> 
+         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={4}>
             <StatCard
               icon={<CloudUploadIcon sx={{ fontSize: 40 }} />}
@@ -281,10 +320,22 @@ const Profile = () => {
               loading={statsLoading}
             />
           </Grid>
-        </Grid>
+        </Grid> */}
 
         {/* Error and Success Messages */}
         {(error || localError) && (
+  <div className="mb-4 text-sm p-4 bg-red-100 border border-red-300 rounded text-red-800">
+    {localError || error}
+  </div>
+)}
+
+{success && (
+  <div className="mb-4 text-sm p-4 bg-green-100 border border-green-300 rounded text-green-800">
+    {success}
+  </div>
+)}
+
+        {/* {(error || localError) && (
           <Alert severity="error" sx={{ mb: 3 }}>
             {localError || error}
           </Alert>
@@ -294,10 +345,159 @@ const Profile = () => {
           <Alert severity="success" sx={{ mb: 3 }}>
             {success}
           </Alert>
-        )}
+        )} */}
 
         {/* Profile Form Section */}
-        <Card
+<div className="bg-white rounded-2xl shadow-md overflow-visible p-6">
+  {/* Header with Edit / Save / Cancel Buttons */}
+  <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
+    <h4 className="text-xl font-bold text-slate-800">Profile Information</h4>
+
+    <div className="flex gap-2">
+      {!isEditing ? (
+        <button
+          onClick={() => setIsEditing(true)}
+          className="cursor-pointer bg-gradient-to-r from-indigo-600 to-indigo-800 text-white font-semibold px-4 py-2 rounded-md hover:from-indigo-800 hover:to-indigo-600 transition"
+        >
+          <EditIcon className="mr-2" /> Edit Profile
+        </button>
+      ) : (
+        <>
+          <button
+            onClick={handleCancel}
+            className="cursor-pointer border border-slate-400 text-slate-600 px-4 py-2 rounded-md"
+          >
+            <CancelIcon className="mr-1" /> Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-gradient-to-r from-emerald-500 to-emerald-700 text-white font-semibold px-4 py-2 rounded-md hover:from-emerald-700 hover:to-emerald-500 transition"
+          >
+            {loading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <>
+                <SaveIcon className="mr-1" /> Save Changes
+              </>
+            )}
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+
+  {/* Profile Inputs */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+      <div className="flex items-center border rounded px-3 py-2 shadow-sm">
+        <PersonIcon className="text-slate-500 mr-2" />
+        <input
+          type="text"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className="w-full outline-none bg-transparent"
+        />
+      </div>
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+      <div className="flex items-center border rounded px-3 py-2 shadow-sm">
+        <EmailIcon className="text-slate-500 mr-2" />
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className="w-full outline-none bg-transparent"
+        />
+      </div>
+    </div>
+  </div>
+
+  {/* Password Fields */}
+  {isEditing && (
+    <>
+      <hr className="my-6 border-gray-300" />
+      <h5 className="text-lg font-semibold text-slate-800 mb-4">🔐 Change Password</h5>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Current Password */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+          <div className="flex items-center border rounded px-3 py-2 shadow-sm">
+            <LockIcon className="text-slate-500 mr-2" />
+            <input
+              type={showCurrentPassword ? "text" : "password"}
+              name="currentPassword"
+              value={formData.currentPassword}
+              onChange={handleChange}
+              className="w-full outline-none bg-transparent"
+            />
+            <button
+              type="button"
+              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+              className="ml-2"
+            >
+              {showCurrentPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </button>
+          </div>
+        </div>
+
+        {/* New Password */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+          <div className="flex items-center border rounded px-3 py-2 shadow-sm">
+            <LockIcon className="text-slate-500 mr-2" />
+            <input
+              type={showNewPassword ? "text" : "password"}
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleChange}
+              className="w-full outline-none bg-transparent"
+            />
+            <button
+              type="button"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+              className="ml-2"
+            >
+              {showNewPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </button>
+          </div>
+        </div>
+
+        {/* Confirm Password */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+          <div className="flex items-center border rounded px-3 py-2 shadow-sm">
+            <LockIcon className="text-slate-500 mr-2" />
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="w-full outline-none bg-transparent"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="ml-2"
+            >
+              {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  )}
+</div>
+
+        {/* <Card
           sx={{
             background: "white",
             borderRadius: 3,
@@ -526,7 +726,7 @@ const Profile = () => {
               </>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Refresh Button */}
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>

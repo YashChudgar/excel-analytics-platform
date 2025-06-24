@@ -133,7 +133,7 @@ function FeatureItem({ icon: Icon, title, description }) {
 }
 
   return (
-    <div className="mt-20 min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-indigo-900 py-0 relative overflow-hidden">
+    <div className="mt-15 min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-indigo-900 py-0 relative overflow-hidden">
       {/* Floating Icons */}
       <motion.div
         className="absolute top-[5%] left-[2%] w-[60px] h-[60px] rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center z-0"

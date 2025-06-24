@@ -19,6 +19,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Logo from "./Logo";
 import { logout as logoutAction } from "../features/auth/authSlice"; // Adjust path as per your redux slice
 
+
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -96,6 +97,12 @@ useEffect(() => {
   window.addEventListener("scroll", handleScroll);
   return () => window.removeEventListener("scroll", handleScroll);
 }, [lastScrollY]);
+
+//navbar should be visible only on landing page
+const allowedPaths = ["/", "/login", "/register","/forgot-password","/unauthorized","/about","/careers","/contact"];
+const isVisiblePage = allowedPaths.includes(location.pathname);
+if (!isVisiblePage) return null;
+
 
   return (
     <AppBar

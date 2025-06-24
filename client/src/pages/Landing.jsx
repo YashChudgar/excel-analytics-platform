@@ -139,6 +139,26 @@ const Landing = () => {
 }; */}
 
 
+{/* SVG Divider with Tailwind-Matching Gradient */}
+  <div className="relative bg-[#eef2ff]">
+  <svg
+    className="w-full h-24 md:h-32 lg:h-40 animate-fade-in"
+    viewBox="0 0 1440 320"
+    preserveAspectRatio="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill="#eef2ff"
+      filter="drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05))"
+      d="M0,224L48,208C96,192,192,160,288,144C384,128,480,128,576,133.3C672,139,768,149,864,154.7C960,160,1056,160,1152,160C1248,160,1344,160,1392,160L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+    />
+  </svg>
+</div>
+
+
+
+
+
      {/* Features Section */}
       <section id="features" className="py-20 bg-gradient-to-br from-indigo-50 via-blue-100 to-purple-100">
   <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -241,14 +261,14 @@ const Landing = () => {
 
 
      {/* Testimonials Section */}
-<div className="py-20 bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-200 overflow-hidden">
+<div className="py-20 pb-28 bg-gradient-to-br from-indigo-50 via-indigo-100 to-indigo-200">
     <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-700 bg-clip-text text-transparent drop-shadow-md">
     Trusted by Teams and Professionals Worldwide
   </h2>
 
   <div className="relative w-full overflow-hidden">
     <motion.div
-      className="flex gap-8 w-max"
+      className="flex gap-8 w-max pt-4 pb-6"
       animate={controls}
       initial={{ x: "0%" }}
     >

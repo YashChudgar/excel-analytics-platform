@@ -184,7 +184,7 @@ const Login = () => {
       overflowY: "auto",
     }}
   >
-    <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1, paddingTop: "80px" }}>
+    <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
       <Grid
         container
         spacing={4}
@@ -199,6 +199,8 @@ const Login = () => {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
+            className="pt-0 mt-0"
+            style={{ marginTop: 0,paddingTop: 0 }}
           >
             <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
               Unlock Insights with Excellytics
@@ -235,7 +237,9 @@ const Login = () => {
             <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}>
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            style={{paddingTop: 25}}
+            >
               <Box
                 sx={{
                   display: "flex",

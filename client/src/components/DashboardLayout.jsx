@@ -8,6 +8,7 @@ import {
   Box,
   Typography,
   Divider,
+  Button
 } from "@mui/material";
 import Logo from "./Logo";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -20,6 +21,10 @@ import ChatIcon from "@mui/icons-material/Chat";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import PersonIcon from "@mui/icons-material/Person";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useDispatch } from "react-redux";
+import { logout as logoutAction } from "../features/auth/authSlice"; // adjust path
+
 
 const sidebarItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
@@ -30,11 +35,19 @@ const sidebarItems = [
   { text: "Profile", icon: <PersonIcon />, path: "/profile" },
 ];
 
+
 const sidebarWidth = 250;
 
 const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+
+
+const handleLogout = () => {
+  dispatch(logoutAction());
+  navigate("/"); // or redirect to login
+};
 
   return (
     <Box
@@ -119,6 +132,30 @@ const DashboardLayout = ({ children }) => {
             </ListItem>
           ))}
         </List>
+        <Divider sx={{ borderColor: "rgba(255,255,255,0.12)", mx: 2, my: 2 }} />
+
+<Box sx={{ px: 3, pb: 4 }}>
+  <Button
+    variant="contained"
+    fullWidth
+    onClick={handleLogout}
+    startIcon={<LogoutIcon />}
+    sx={{
+      background: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
+      color: "#fff",
+      fontWeight: 600,
+      textTransform: "none",
+      borderRadius: 2,
+      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+      "&:hover": {
+        background: "linear-gradient(135deg, #b91c1c 0%, #ef4444 100%)",
+      },
+    }}
+  >
+    Logout
+  </Button>
+</Box>
+
       </Drawer>
       <Box
         sx={{

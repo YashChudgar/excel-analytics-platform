@@ -141,44 +141,7 @@ const googleLoginHandler = async (req, res, mode) => {
 };
 const googleLogin = (req, res) => googleLoginHandler(req, res, "login");
 const googleRegister = (req, res) => googleLoginHandler(req, res, "register");
-// const googleLogin = async (req, res) => {
-//   try {
-//     const { token } = req.body;
-//     const ticket = await client.verifyIdToken({
-//       idToken: token,
-//       audience: process.env.GOOGLE_CLIENT_ID,
-//     });
 
-//     const payload = ticket.getPayload();
-//     const { sub, email, name, picture } = payload;
-
-//     let user = await User.findOne({ email });
-
-//     if (!user) {
-//       const generatedUsername = email.split('@')[0] + Math.floor(Math.random() * 1000);
-
-//       user = await User.create({
-//         username: generatedUsername,
-//         name,
-//         email,
-//         profilePic: picture,
-//         googleId: sub,
-//         password: Math.random().toString(36).slice(-8), // placeholder password
-//       });
-//     }
-
-//     // Create JWT
-//     const tokenJWT = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-//       expiresIn: "7d",
-//     });
-
-//     res.status(200).json({ user, token: tokenJWT });
-
-//   } catch (err) {
-//     console.error("Google login error:", err);
-//     res.status(401).json({ message: "Google login failed" });
-//   }
-// };
 
 const checkUserExists = async (req, res) => {
   const { email } = req.body;

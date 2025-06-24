@@ -11,7 +11,7 @@ import TableChartIcon from "@mui/icons-material/TableChart";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Dashboard = () => {
+const Dashboard = ({childern,hideNavbar=false}) => {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
 
@@ -119,8 +119,8 @@ const Dashboard = () => {
   ];
 
   return (
-    <DashboardLayout>
-      <main className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
+    <DashboardLayout hideNavbar={true}>
+      <main className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8 pt-0">
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -136,14 +136,14 @@ const Dashboard = () => {
         <h3 className="text-2xl font-semibold mt-10 mb-6 text-indigo-700">
           Features
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
           {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.15 }}
-              className={`p-6 bg-white border border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 ${
+              className={`flex flex-col justify-between h-full p-6 bg-white border border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 ${
                 feature.onClick ? "cursor-pointer" : ""
               }`}
               onClick={feature.onClick}
