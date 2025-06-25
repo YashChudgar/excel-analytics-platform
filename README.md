@@ -119,16 +119,27 @@ Powered by OpenAI or Gemini (via serverless function or backend endpoint)
 📁 Folder Structure
 
 📦 excel-analytics-platform
+
 ├── backend
+
 │   ├── controllers
+
 │   ├── routes
+
 │   ├── models
+
 │   └── ...
+
 ├── frontend
+
 │   ├── components
+
 │   ├── pages
+
 │   ├── redux
+
 │   └── ...
+
 
 
 🙌 Contributing
