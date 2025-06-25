@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { auth } = require("../middlewares/auth");
-const { generateInsights } = require("../controllers/aiController");
+const { generateAIInsights } = require("../controllers/insightController");
 
 // AI analysis route
-router.post("/analyze/:fileId", auth, generateInsights);
+router.post("/ai-insights/:fileId", auth, generateAIInsights);
 
 module.exports = router;

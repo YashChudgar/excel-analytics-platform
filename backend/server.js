@@ -12,6 +12,7 @@ const aiRoutes = require("./routes/aiRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -44,7 +45,7 @@ app.use('/api/auth', authRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/ai", aiRoutes);
+app.use("/api", aiRoutes);
 app.use("/api/chat", chatRoutes);
 app.use('/api/contact', contactRoutes);
 

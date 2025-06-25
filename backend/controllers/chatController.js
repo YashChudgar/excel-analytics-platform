@@ -1,96 +1,49 @@
 const UserFile = require("../models/UserFile");
 const { createActivity } = require("./userActivityController");
-const OpenAI = require("openai");
 const xlsx = require("xlsx");
 const axios = require("axios");
+const OpenAI = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+require("dotenv").config();
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Helper function to read Excel file
 const readExcelFile = async (fileUrl) => {
   try {
-    console.log("Attempting to read Excel file from URL:", fileUrl);
     const response = await axios.get(fileUrl, {
       responseType: "arraybuffer",
-      timeout: 10000, // 10 second timeout
+      timeout: 10000,
     });
-
-    if (!response.data) {
-      throw new Error("No data received from file URL");
-    }
-
-    console.log("Successfully downloaded file, size:", response.data.length);
     const workbook = xlsx.read(response.data, { type: "array" });
-
-    if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
-      throw new Error("No sheets found in Excel file");
-    }
-
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const data = xlsx.utils.sheet_to_json(worksheet);
-
-    if (!data || data.length === 0) {
-      throw new Error("No data found in Excel sheet");
-    }
-
-    console.log("Successfully parsed Excel file, rows:", data.length);
-    return data;
+    return xlsx.utils.sheet_to_json(worksheet);
   } catch (error) {
-    console.error("Error reading Excel file:", {
-      message: error.message,
-      code: error.code,
-      url: fileUrl,
-    });
     throw new Error(`Failed to read Excel file: ${error.message}`);
   }
 };
 
-// Helper function to format data for AI
 const formatDataForAI = (data) => {
-  try {
-    if (!data || data.length === 0) {
-      return "No data available";
-    }
-
-    // Get column names
-    const columns = Object.keys(data[0]);
-
-    // Create a summary of the data
-    const summary = {
-      totalRows: data.length,
-      columns: columns,
-      sampleData: data.slice(0, 5), // First 5 rows as sample
-    };
-
-    return JSON.stringify(summary, null, 2);
-  } catch (error) {
-    console.error("Error formatting data for AI:", error);
-    throw new Error("Failed to format data for analysis");
-  }
+  if (!data || data.length === 0) return "No data available";
+  const columns = Object.keys(data[0]);
+  const summary = {
+    rows: data.length,
+    columns,
+    sample: data.slice(0, 2),
+  };
+  return JSON.stringify(summary);
 };
 
-// Handle chat messages for a specific file
 const handleChatMessage = async (req, res) => {
   try {
-    console.log("Processing chat message for file:", req.params.fileId);
-
     const file = await UserFile.findOne({
       _id: req.params.fileId,
       user: req.user._id,
     });
 
-    if (!file) {
-      console.log("File not found:", req.params.fileId);
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    if (!file.cloudinaryUrl) {
-      console.log("File has no cloudinary URL:", file._id);
-      return res.status(400).json({ error: "File URL not available" });
+    if (!file || !file.cloudinaryUrl) {
+      return res.status(404).json({ error: "Valid file not found" });
     }
 
     const { message } = req.body;
@@ -98,47 +51,46 @@ const handleChatMessage = async (req, res) => {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    console.log("Reading Excel file data...");
     const fileData = await readExcelFile(file.cloudinaryUrl);
-    console.log("Formatting data for AI...");
     const formattedData = formatDataForAI(fileData);
 
-    // Create the prompt for the AI
-    const prompt = `You are an AI assistant analyzing an Excel file. Here's the data structure:
-${formattedData}
+    const prompt = `Analyze this Excel data structure:\n${formattedData}\n\nUser question: ${message}\n\nRespond with:\n1. Direct answer\n2. Key data patterns\n3. Notable insights/trends\n4. Recommendations\n\nKeep the tone professional and concise.`;
 
-User question: ${message}
+    let fullText = "";
 
-Please provide a detailed analysis based on the data. Include:
-1. Direct answer to the question
-2. Relevant data points or patterns
-3. Any insights or trends you notice
-4. Recommendations based on the data
+    // ✅ Try OpenAI first
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+      });
+      fullText = completion.choices[0]?.message?.content;
+    } catch (openaiErr) {
+      if (openaiErr.status === 429) {
+        console.warn("⚠️ OpenAI rate limit hit. Falling back to Gemini.");
 
-Format your response in a clear, professional manner.`;
+        const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro" });
 
-    console.log("Sending request to OpenAI...");
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert data analyst assistant. Your role is to analyze Excel data and provide insights based on user questions. Be precise, professional, and data-driven in your responses.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 1000,
-    });
+        const result = await model.generateContentStream({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+        });
 
-    const aiResponse = completion.choices[0].message.content;
-    console.log("Received response from OpenAI");
+        for await (const chunk of result.stream) {
+          fullText += chunk.text();
+        }
+      } else {
+        throw openaiErr;
+      }
+    }
 
-    // Log activity
+    if (!fullText) {
+      return res.status(502).json({
+        error: "Both AI providers failed",
+        details: "Empty response from both OpenAI and Gemini.",
+      });
+    }
+
     await createActivity(
       req.user._id,
       "chat",
@@ -146,32 +98,20 @@ Format your response in a clear, professional manner.`;
       file._id
     );
 
-    res.json({ response: aiResponse });
+    res.json({ response: fullText });
   } catch (error) {
-    console.error("Error in handleChatMessage:", {
-      message: error.message,
-      stack: error.stack,
-      fileId: req.params.fileId,
-    });
+    console.error("❌ Error in handleChatMessage:", error);
 
-    // Send appropriate error response
-    if (error.message.includes("Failed to read Excel file")) {
+    if (error.message.includes("Excel")) {
       return res.status(400).json({
         error: "Error reading Excel file",
         details: error.message,
       });
     }
 
-    if (error.message.includes("OpenAI")) {
-      return res.status(500).json({
-        error: "Error communicating with AI service",
-        details: error.message,
-      });
-    }
-
-    res.status(500).json({
-      error: "Error processing chat message",
-      details: error.message,
+    return res.status(500).json({
+      error: "AI chat processing failed",
+      details: error.message || "Unexpected server error",
     });
   }
 };

@@ -436,10 +436,10 @@ const ExcelAnalytics = () => {
       return isNaN(value) ? 0 : value;
     });
 
-    console.log("Selected X:", selectedXAxis);
-    console.log("Selected Y:", selectedYAxis);
-    console.log("Labels:", labels);
-    console.log("Data:", data);
+    // console.log("Selected X:", selectedXAxis);
+    // console.log("Selected Y:", selectedYAxis);
+    // console.log("Labels:", labels);
+    // console.log("Data:", data);
 
     // ✅ If chart is pie, limit data to top 10 items
     if (chartStyle === "pie") {
@@ -462,7 +462,7 @@ const ExcelAnalytics = () => {
     };
 
     setChartData(chartConfig);
-    console.log("✅ Chart config set:", chartConfig);
+    // console.log("✅ Chart config set:", chartConfig);
 
     // Update analysis timestamp
     if (fileId) {
@@ -506,11 +506,11 @@ const ExcelAnalytics = () => {
     }
 
     try {
-      console.log("Uploading file:", {
-        name: file.name,
-        type: file.type,
-        size: file.size,
-      });
+      // console.log("Uploading file:", {
+      //   name: file.name,
+      //   type: file.type,
+      //   size: file.size,
+      // });
 
       const response = await axiosInstance.post("/upload", formData, {
         headers: {
@@ -519,7 +519,7 @@ const ExcelAnalytics = () => {
         },
       });
 
-      console.log("Upload response:", response.data);
+      // console.log("Upload response:", response.data);
 
       const uploaded = response?.data?.upload;
       if (!uploaded || !uploaded.cloudinaryUrl || !uploaded._id) {
@@ -630,7 +630,7 @@ const ExcelAnalytics = () => {
 
   // plugins: [watermarkPlugin]
   const renderChart = () => {
-    console.log("📊 Rendering chart with data:", chartData);
+    // console.log("📊 Rendering chart with data:", chartData);
 
     if (
       !chartData ||
@@ -750,12 +750,12 @@ const ExcelAnalytics = () => {
         const isLine = chartStyle === "line";
         const isBar = chartStyle === "bar";
 
-        if (isPie) {
-          console.log(
-            "🧁 Pie slice colors:",
-            ds.data.map((_, j) => palette[j % palette.length])
-          );
-        }
+        // if (isPie) {
+        //    console.log(
+        //      "🧁 Pie slice colors:",
+        //      ds.data.map((_, j) => palette[j % palette.length])
+        //    );
+        // }
 
         return {
           ...ds,
@@ -788,7 +788,7 @@ const ExcelAnalytics = () => {
       }),
     };
 
-    console.log("🎨 Styled Data:", styledData);
+    // console.log("🎨 Styled Data:", styledData);
 
     // 7. 3D fallback
     if (chartType === "3d") return render3DChart();

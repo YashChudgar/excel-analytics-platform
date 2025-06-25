@@ -6,12 +6,12 @@ const createAdminUser = async () => {
   try {
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
     // Check if admin user already exists
     const existingAdmin = await User.findOne({ email: "admin@gmail.com" });
     if (existingAdmin) {
-      console.log("Admin user already exists");
+      // console.log("Admin user already exists");
       return;
     }
 
@@ -25,12 +25,12 @@ const createAdminUser = async () => {
     });
 
     await adminUser.save();
-    console.log("Admin user created successfully");
+    // console.log("Admin user created successfully");
   } catch (error) {
     console.error("Error creating admin user:", error);
   } finally {
     await mongoose.disconnect();
-    console.log("Disconnected from MongoDB");
+    // console.log("Disconnected from MongoDB");
   }
 };
 

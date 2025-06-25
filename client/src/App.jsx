@@ -33,6 +33,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import AdminRoute from "./components/AdminRoute";
 import UserRoute from "./components/UserRoute";
 import ForgotPassword from "./pages/ForgotPassword";
+import Chat from "./pages/Chat";
+import AIInsights from "./pages/AIInsights";
 
 function App() {
   return (
@@ -67,6 +69,8 @@ function App() {
                 <Route path="/admin/users" element={<UserManagement />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/history" element={<History />} />
+                <Route path="/chat" element={<Chat />} />
+                <Route path="/ai-insights" element={<AIInsights />} />
               </Route>
 
               {/* Admin-only routes */}

@@ -18,7 +18,7 @@ const isTokenValid = (token) => {
     const expiry = payload.exp * 1000;
     const now = Date.now();
 
-    console.log("Token expiry:", new Date(expiry), "Now:", new Date(now));
+    // console.log("Token expiry:", new Date(expiry), "Now:", new Date(now));
     return expiry > now;
   } catch (error) {
     console.error('Token validation error:', error.message);

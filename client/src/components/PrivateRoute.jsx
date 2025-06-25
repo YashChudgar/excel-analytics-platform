@@ -9,9 +9,6 @@ const PrivateRoute = () => {
 
   const isAuthenticated = !!token && !!user;
 
-  // console.log("PrivateRoute: token =", token);
-  // console.log("PrivateRoute: user =", user);
-  // console.log("isAuthenticated:", isAuthenticated);
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
 };

@@ -33,24 +33,24 @@ const userSchema = new mongoose.Schema({
 
 
 userSchema.pre("save", async function (next) {
-  console.log("📌 Inside pre-save hook");
+  // console.log("📌 Inside pre-save hook");
 
   if (!this.isModified("password")) {
-    console.log("⚠️ Password not modified — skipping hash");
+    // console.log("⚠️ Password not modified — skipping hash");
     return next();
   }
 
-  console.log("🔐 Password IS modified, hashing now...");
+  // console.log("🔐 Password IS modified, hashing now...");
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  console.log("✅ Password hashed:", this.password);
+  // console.log("✅ Password hashed:", this.password);
 
   next();
 });
 
 
 userSchema.methods.comparePassword = function (candidatePassword) {
-  console.log("Comparing:", candidatePassword, "with:", this.password);
+  // console.log("Comparing:", candidatePassword, "with:", this.password);
   return bcrypt.compare(candidatePassword, this.password);
 };
 

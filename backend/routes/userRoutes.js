@@ -23,7 +23,7 @@ router.get("/activities", auth, getUserActivities);
 
 // 📝 Profile Update (✅ This is the key route you're debugging)
 router.put("/profile", auth, (req, res, next) => {
-  console.log("🔥 Route hit: /api/user/profile");
+  // console.log("🔥 Route hit: /api/user/profile");
   next();
 }, updateUserProfile);
 

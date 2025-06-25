@@ -46,8 +46,8 @@ const login = async (req, res) => {
     }
 
     const isMatch = await user.comparePassword(password); // this calls bcrypt.compare internally
-    console.log("Comparing:", password, "with:", user.password);
-    console.log("Match result:", isMatch);
+    // console.log("Comparing:", password, "with:", user.password);
+    // console.log("Match result:", isMatch);
 
     if (!isMatch) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
@@ -145,7 +145,7 @@ const googleRegister = (req, res) => googleLoginHandler(req, res, "register");
 
 const checkUserExists = async (req, res) => {
   const { email } = req.body;
-  console.log("Checking email:", email);
+  // console.log("Checking email:", email);
 
   try {
     const user = await User.findOne({ email: email.toLowerCase().trim() });
@@ -177,7 +177,7 @@ const resetPasswordDirect = async (req, res) => {
 
     await user.save();
 
-    console.log("✅ Password updated for:", user.email);
+    // console.log("✅ Password updated for:", user.email);
     res.json({ message: "Password updated successfully" });
   } catch (err) {
     console.error("❌ Error in resetPasswordDirect:", err);

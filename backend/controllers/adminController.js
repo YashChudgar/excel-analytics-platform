@@ -10,11 +10,7 @@ const adminController = {
       // Get active users (users who have logged in within the last 7 days, excluding admins)
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      // console.log(
-      //   "Checking for active users since:",
-      //   sevenDaysAgo,
-      //   "excluding admins"
-      // );
+     
 
       const activeUsers = await User.countDocuments({
         lastLogin: { $gte: sevenDaysAgo },
@@ -80,14 +76,14 @@ const adminController = {
         .sort({ createdAt: -1 })
         .limit(10);
 
-      console.log(
-        "User lastLogin timestamps:",
-        users.map((u) => ({
-          email: u.email,
-          lastLogin: u.lastLogin,
-          isActive: u.lastLogin >= sevenDaysAgo,
-        }))
-      );
+      // console.log(
+      //   "User lastLogin timestamps:",
+      //   users.map((u) => ({
+      //     email: u.email,
+      //     lastLogin: u.lastLogin,
+      //     isActive: u.lastLogin >= sevenDaysAgo,
+      //   }))
+      // );
 
       res.json({
         totalUsers,
@@ -107,7 +103,7 @@ const adminController = {
         })),
       });
     } catch (error) {
-      // console.error("Error fetching admin dashboard data:", error);
+      console.error("Error fetching admin dashboard data:", error);
       res.status(500).json({ error: "Failed to fetch admin dashboard data" });
     }
   },

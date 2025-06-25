@@ -114,7 +114,7 @@ const Login = () => {
   }
 
   const tokenId = response.credential;
-  console.log("Google credential:", tokenId);
+  // console.log("Google credential:", tokenId);
 
   try {
     const res = await axiosInstance.post("/auth/google/login", {
