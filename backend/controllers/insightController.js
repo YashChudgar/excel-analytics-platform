@@ -1,12 +1,6 @@
 const UserFile = require("../models/UserFile");
 const xlsx = require("xlsx");
 const axios = require("axios");
-const OpenAI = require("openai");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-require("dotenv").config();
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const readExcelFile = async (fileUrl) => {
   const response = await axios.get(fileUrl, {
@@ -19,14 +13,14 @@ const readExcelFile = async (fileUrl) => {
   return xlsx.utils.sheet_to_json(worksheet);
 };
 
-const formatDataForAI = (data) => {
+const formatDataForMock = (data) => {
   if (!data || data.length === 0) return "No data available";
   const columns = Object.keys(data[0]);
-  return JSON.stringify({
+  return {
     rows: data.length,
     columns,
     sample: data.slice(0, 2),
-  });
+  };
 };
 
 const generateAIInsights = async (req, res) => {
@@ -41,58 +35,39 @@ const generateAIInsights = async (req, res) => {
     }
 
     const data = await readExcelFile(file.cloudinaryUrl);
-    const formattedData = formatDataForAI(data);
+    const summary = formatDataForMock(data);
 
-    const prompt = `
-Analyze the following Excel dataset and provide:
-1. A brief description of what the data is about
-2. Trends, patterns or correlations
-3. Outliers or anomalies
-4. Business insights and recommendations
-Respond in markdown format:
+    // ✅ MOCK INSIGHTS (replace this later with real AI)
+    const insights = `
+### 📊 Mock Insights
 
-${formattedData}
+- **File Name**: ${file.originalName}
+- **Rows**: ${summary.rows}
+- **Columns**: ${summary.columns.join(", ")}
+- **Sample Data**: 
+\`\`\`json
+${JSON.stringify(summary.sample, null, 2)}
+\`\`\`
+
+---
+
+### 📈 Trends:
+- The dataset appears to track consistent metrics across rows.
+- Values suggest increasing activity in later rows (see sample).
+
+### 🧠 Insights:
+- Column "${summary.columns[0]}" seems to be the primary identifier.
+- Try segmenting data by "${summary.columns[1]}" for further analysis.
+
+### ✅ Recommendations:
+- Use Excel filtering on "${summary.columns[2]}" to extract key rows.
+- Re-upload file with clearer column headers if needed.
 `;
-
-    let insights = "";
-
-    try {
-      const result = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-      });
-      insights = result.choices[0]?.message?.content;
-    } catch (err) {
-      if (err.status === 429) {
-        console.warn("OpenAI rate limit hit. Using Gemini fallback.");
-        const model = genAI.getGenerativeModel({
-          model: "models/gemini-1.5-pro",
-        });
-
-        const result = await model.generateContentStream({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-        });
-
-        for await (const chunk of result.stream) {
-          insights += chunk.text();
-        }
-      } else {
-        throw err;
-      }
-    }
-
-    if (!insights) {
-      return res.status(502).json({
-        error: "AI failed to generate insights",
-        details: "Empty response from OpenAI and Gemini",
-      });
-    }
 
     res.json({ insights });
   } catch (error) {
-    console.error("AI Insights Error:", error);
-    res.status(500).json({ error: "Server error", details: error.message });
+    console.error("Mock AI Insights Error:", error);
+    res.status(500).json({ error: "Failed to generate insights", details: error.message });
   }
 };
 

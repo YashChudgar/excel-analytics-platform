@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
+const rateLimit = require("express-rate-limit");
 // Unified authentication middleware
 const auth = async (req, res, next) => {
   try {
@@ -29,6 +29,12 @@ const auth = async (req, res, next) => {
   }
 };
 
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // Max 5 requests per minute
+  message: "Too many chat requests. Please wait a minute.",
+});
+
 // Admin check middleware
 const isAdmin = async (req, res, next) => {
   try {
@@ -50,4 +56,5 @@ const isAdmin = async (req, res, next) => {
 module.exports = {
   auth,
   isAdmin,
+  chatLimiter,
 };
