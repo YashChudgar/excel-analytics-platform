@@ -95,20 +95,29 @@ npm start
 
 3. Set up the frontend:
 cd ../frontend
+
 npm install
+
 npm run dev
 
 🔐 Authentication
+
 JWT-based login/register
+
 Role-based access (User, Admin)
+
 Google OAuth integration (optional)
 
 ✨ AI Insight Feature (Optional)
+
 Upload an Excel file
+
 Get a summary, trends, or insights using AI APIs
+
 Powered by OpenAI or Gemini (via serverless function or backend endpoint)
 
 📁 Folder Structure
+
 📦 excel-analytics-platform
 ├── backend
 │   ├── controllers
@@ -123,8 +132,10 @@ Powered by OpenAI or Gemini (via serverless function or backend endpoint)
 
 
 🙌 Contributing
+
 Pull requests are welcome! Please fork the repo and submit PRs.
 
 📄 License
+
 MIT License
 
