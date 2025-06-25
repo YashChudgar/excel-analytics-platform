@@ -113,7 +113,7 @@ const Landing = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/register")}
-                className="py-3 px-6 text-lg rounded-xl font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-900 hover:from-indigo-900 hover:to-indigo-600 transition"
+                className="cursor-pointer py-3 px-6 text-lg rounded-xl font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-900 hover:from-indigo-900 hover:to-indigo-600 transition"
               >
                 Get Started
               </motion.button>
@@ -363,7 +363,7 @@ const Landing = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate("/register")}
-          className="py-3 px-8 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-indigo-900 hover:from-indigo-900 hover:to-indigo-600 transition"
+          className="cursor-pointer py-3 px-8 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-indigo-900 hover:from-indigo-900 hover:to-indigo-600 transition"
         >
           Sign Up Now
         </motion.button>

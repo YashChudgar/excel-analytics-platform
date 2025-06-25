@@ -14,37 +14,38 @@ const Chat = () => {
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState([]);
   const [selectedFileId, setSelectedFileId] = useState("");
+  const [cooldown, setCooldown] = useState(false);
 
-  // Fetch uploaded files on component mount
   useEffect(() => {
     const fetchFiles = async () => {
       try {
         const res = await axiosInstance.get("/user/files");
-        setFiles(res.data.files || res.data); // fallback for both formats
+        setFiles(res.data.files || res.data);
       } catch (err) {
         console.error("❌ Failed to fetch files:", err.response || err);
       }
     };
-
     fetchFiles();
   }, []);
 
   const handleSend = async () => {
-    if (!message.trim() || !selectedFileId) return;
+    if (!message.trim() || !selectedFileId || cooldown) return;
 
     try {
       setLoading(true);
+      setCooldown(true);
       setResponse("");
       const res = await axiosInstance.post(`/chat/${selectedFileId}`, { message });
 
       if (res.data?.response) {
         setResponse(res.data.response);
       } else {
-        console.warn("⚠️ Unexpected response from AI:", res.data);
         setResponse("❌ No response from AI. Check server logs.");
       }
+
+      // Start 15s cooldown
+      setTimeout(() => setCooldown(false), 15000);
     } catch (err) {
-      console.error("❌ AI request error:", err.response?.data || err.message || err);
       const serverError = err.response?.data?.error || "Failed to get AI response.";
       const details = err.response?.data?.details || "";
       setResponse(`❌ ${serverError}\n${details}`);
@@ -111,11 +112,11 @@ const Chat = () => {
               />
               <button
                 onClick={handleSend}
-                disabled={loading || !selectedFileId}
+                disabled={loading || !selectedFileId || cooldown}
                 className="bg-indigo-600 hover:bg-indigo-700 px-4 py-3 text-white transition-all flex items-center gap-2 disabled:opacity-50"
               >
                 <PaperAirplaneIcon className="h-5 w-5" />
-                {loading ? "Sending..." : "Send"}
+                {loading ? "Sending..." : cooldown ? "Wait..." : "Send"}
               </button>
             </div>
           </motion.div>
@@ -128,7 +129,7 @@ const Chat = () => {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="bg-gray-50 border border-indigo-200 rounded-xl p-5 text-gray-800 whitespace-pre-wrap leading-relaxed"
             >
-              <h3 className="text-lg font-semibold text-indigo-700 mb-3">💡 Gemini AI Insight</h3>
+              <h3 className="text-lg font-semibold text-indigo-700 mb-3">💡 AI Insight</h3>
               {response}
             </motion.div>
           )}

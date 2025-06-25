@@ -1196,7 +1196,7 @@ const ExcelAnalytics = () => {
             </div>
 
             {/* ✅ Custom Filename Input */}
-            {/* {chartType === "2d" && (
+            {chartType === "2d" && (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">
         Custom Filename
@@ -1209,7 +1209,7 @@ const ExcelAnalytics = () => {
         className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
     </div>
-    )} */}
+    )}
 
             {/* ✅ Chart Container */}
             <div

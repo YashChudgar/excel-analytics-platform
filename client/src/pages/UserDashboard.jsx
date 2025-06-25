@@ -315,14 +315,14 @@ const Dashboard = ({childern,hideNavbar=false}) => {
                       <td className="p-4 flex gap-4">
                         <button
                           onClick={() => handleAnalyzeFile(file._id)}
-                          className="text-blue-600 hover:text-blue-800 transition p-1 rounded hover:bg-blue-50"
+                          className="cursor-pointer text-blue-600 hover:text-blue-800 transition p-1 rounded hover:bg-blue-50"
                           title="Analyze File"
                         >
                           <AnalyticsIcon fontSize="small" />
                         </button>
                         <button
                           onClick={() => handleDeleteFile(file._id)}
-                          className="text-red-500 hover:text-red-700 transition p-1 rounded hover:bg-red-50"
+                          className="cursor-pointer text-red-500 hover:text-red-700 transition p-1 rounded hover:bg-red-50"
                           title="Delete File"
                         >
                           <DeleteIcon fontSize="small" />
