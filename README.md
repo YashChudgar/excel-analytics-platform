@@ -1,4 +1,5 @@
-📊 Excel Analytics Platform
+📊 Excel Analytics Platform:
+
 A powerful web-based platform to upload and analyze Excel files (.xls, .xlsx), visualize data with interactive 2D and 3D charts, and optionally get smart AI-powered insights.
 
 🚀 Features
