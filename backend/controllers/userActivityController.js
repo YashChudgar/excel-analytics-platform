@@ -1,35 +1,34 @@
 const UserActivity = require("../models/UserActivity");
-const UserFile = require("../models/UserFile");
 
-// Get user activities
+// Get recent user activities
 const getUserActivities = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 5; // Default to 5 if not specified
+    const limit = parseInt(req.query.limit) || 5;
     const activities = await UserActivity.find({ user: req.user._id })
       .sort({ createdAt: -1 })
-      .populate("fileId", "originalName")
+      .populate("file", "originalName") // ✅ field is now "file"
       .limit(limit);
 
     res.json(activities);
   } catch (error) {
-    console.error("Error fetching activities:", error);
+    console.error("❌ Error fetching activities:", error);
     res.status(500).json({ error: "Error fetching activities" });
   }
 };
 
-// Create activity log
-const createActivity = async (userId, type, description, fileId = null) => {
+// Log a new activity
+const createActivity = async (userId, type, description, file = null) => {
   try {
     const activity = new UserActivity({
       user: userId,
       type,
-      description,
-      fileId,
+      description, // ✅ MATCHES your schema
+      file,        // ✅ renamed from fileId → file
     });
     await activity.save();
     return activity;
   } catch (error) {
-    console.error("Error creating activity:", error);
+    console.error("❌ Error creating activity:", error);
   }
 };
 

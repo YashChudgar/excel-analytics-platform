@@ -8,14 +8,14 @@ const userActivitySchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["login", "upload", "analyze", "delete"],
+    enum: ["login", "upload", "analyze", "delete", "chat"], // ✅ Added "chat"
     required: true,
   },
   description: {
     type: String,
     required: true,
   },
-  fileId: {
+  file: { // ✅ Renamed from fileId
     type: mongoose.Schema.Types.ObjectId,
     ref: "UserFile",
   },
