@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useFilesContext } from "../context/FileContext";
 import axiosInstance from "../api/axiosInstance";
 import { motion } from "framer-motion";
 import {
@@ -9,24 +10,11 @@ import {
 import DashboardLayout from "../components/DashboardLayout";
 
 const Chat = () => {
+  const { files, selectedFileId, setSelectedFileId } = useFilesContext();
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
-  const [files, setFiles] = useState([]);
-  const [selectedFileId, setSelectedFileId] = useState("");
   const [cooldown, setCooldown] = useState(false);
-
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const res = await axiosInstance.get("/user/files");
-        setFiles(res.data.files || res.data);
-      } catch (err) {
-        console.error("❌ Failed to fetch files:", err.response || err);
-      }
-    };
-    fetchFiles();
-  }, []);
 
   const handleSend = async () => {
     if (!message.trim() || !selectedFileId || cooldown) return;
@@ -35,7 +23,11 @@ const Chat = () => {
       setLoading(true);
       setCooldown(true);
       setResponse("");
-      const res = await axiosInstance.post(`/chat/${selectedFileId}`, { message });
+
+      // ✅ Only send message — no fileData
+      const res = await axiosInstance.post(`/chat/${selectedFileId}`, {
+        message,
+      });
 
       if (res.data?.response) {
         setResponse(res.data.response);
@@ -43,7 +35,7 @@ const Chat = () => {
         setResponse("❌ No response from AI. Check server logs.");
       }
 
-      // Start 15s cooldown
+      // 15s cooldown
       setTimeout(() => setCooldown(false), 15000);
     } catch (err) {
       const serverError = err.response?.data?.error || "Failed to get AI response.";
