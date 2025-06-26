@@ -43,7 +43,7 @@ export const FileProvider = ({ children }) => {
       }
 
       try {
-        const res = await axiosInstance.get(`/api/files/${selectedFileId}`, {
+        const res = await axiosInstance.get(`/user/files/${selectedFileId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFileData(res.data);
