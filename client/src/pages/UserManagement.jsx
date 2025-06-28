@@ -206,14 +206,6 @@ const UserManagement = () => {
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-text"
             required
           />
-          <select
-            value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
           <div className="flex justify-end space-x-2 pt-2">
             <button
               type="button"
