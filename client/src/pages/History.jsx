@@ -97,9 +97,18 @@ const History = () => {
 
   return (
     <DashboardLayout>
-      <Container maxWidth="lg" sx={{ mt: 7, mb: 4 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
-          Recent Activities
+      <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
+        <Typography
+          variant="h4"
+          text-3xl
+          font-bold
+          text-indigo-700
+          gutterBottom
+          sx={{ mb: 3 }}
+        >
+          <h1 className="text-3xl font-bold text-indigo-700 mb-6">
+            Recent Activities{" "}
+          </h1>
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
           <FormControl sx={{ minWidth: 120 }} size="small">

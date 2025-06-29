@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../features/auth/authActions"; // Redux action, optional to keep
-import {useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import Divider from "@mui/material/Divider";
 import {
@@ -29,66 +29,56 @@ import { motion } from "framer-motion";
 
 function FeatureItem({ icon: Icon, title, description }) {
   return (
-    <div className="flex items-start mb-4">
+    <div className="flex items-start mb-6">
       <div className="bg-white text-indigo-600 p-3 rounded-xl shadow mr-4">
         <Icon style={{ fontSize: 28 }} />
       </div>
       <div>
-        <h4 className="text-lg font-semibold text-white">{title}</h4>
-        <p className="text-sm text-white/80">{description}</p>
+        <h4 className="text-lg font-semibold text-white mb-2">{title}</h4>
+        <p className="text-sm text-white/80 leading-relaxed">{description}</p>
       </div>
     </div>
   );
 }
-
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // Redux auth state (optional)
-  const { loading: reduxLoading, error: reduxError, user: reduxUser } = useSelector(
-  (state) => state.auth
-);
-
+  const { error: reduxError, user: reduxUser } = useSelector(
+    (state) => state.auth
+  );
 
   // Local state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+    e.preventDefault();
+    setError("");
 
-  try {
-    // Dispatch the redux loginUser thunk and wait for result
-    const resultAction = await dispatch(loginUser({ email, password }));
+    try {
+      // Dispatch the redux loginUser thunk and wait for result
+      const resultAction = await dispatch(loginUser({ email, password }));
 
-    if (loginUser.fulfilled.match(resultAction)) {
-      // Login succeeded, loading will be set to false by redux slice
-      // Navigation handled in useEffect watching reduxUser
-    } else {
-      // Login failed
-      setError(resultAction.payload || "Login failed");
-      setLoading(false);
+      if (loginUser.fulfilled.match(resultAction)) {
+        // Login succeeded, loading will be set to false by redux slice
+        // Navigation handled in useEffect watching reduxUser
+      } else {
+        // Login failed
+        setError(resultAction.payload || "Login failed");
+      }
+    } catch (error) {
+      setError(error.message || "Login failed");
     }
-  } catch (error) {
-    setError(error.message || "Login failed");
-    setLoading(false);
-  }
-};
-
+  };
 
   // Watch for reduxUser to redirect after login (if Redux is used)
   useEffect(() => {
     if (reduxUser) {
-      setLoading(false);
       if (reduxUser.role === "admin") {
         navigate("/admin");
       } else {
@@ -101,144 +91,137 @@ const Login = () => {
   useEffect(() => {
     if (reduxError) {
       setError(reduxError);
-      setLoading(false);
     }
   }, [reduxError]);
 
-  
   const handleGoogleLogin = async (response) => {
-  if (!response || !response.credential) {
-    console.error("Google login: No credential received");
-    setError("Google login failed. No credential received.");
-    return;
-  }
+    if (!response || !response.credential) {
+      console.error("Google login: No credential received");
+      setError("Google login failed. No credential received.");
+      return;
+    }
 
-  const tokenId = response.credential;
-  // console.log("Google credential:", tokenId);
+    const tokenId = response.credential;
+    // console.log("Google credential:", tokenId);
 
-  try {
-    const res = await axiosInstance.post("/auth/google/login", {
-      token: tokenId,
-    });
+    try {
+      const res = await axiosInstance.post("/auth/google/login", {
+        token: tokenId,
+      });
 
-    const { user, token } = res.data;
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+      const { user, token } = res.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-    dispatch({
-      type: "auth/loginUser/fulfilled",
-      payload: { user, token },
-    });
+      dispatch({
+        type: "auth/loginUser/fulfilled",
+        payload: { user, token },
+      });
 
-    setMessage("Login successful!");
-    setError("");
+      setError("");
 
-    navigate("/dashboard");
-  } catch (err) {
-    console.error("Google login failed:", err);
-    setError(
-      err.response?.data?.message || "Google login failed. Please try again."
-    );
-    setMessage("");
-  }
-};
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Google login failed:", err);
+      setError(
+        err.response?.data?.message || "Google login failed. Please try again."
+      );
+    }
+  };
 
- 
- 
- useEffect(() => {
-   if (window.google && window.google.accounts) {
-     window.google.accounts.id.initialize({
-       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-       callback: handleGoogleLogin,
-     });
- 
-     window.google.accounts.id.renderButton(
-       document.getElementById("googleSignInDiv"),
-       {
-         theme: "outline",
-         size: "large",
-         shape: "pill",
-         text: "continue_with",
-         width: "250",
-       }
-     );
-   } else {
-     console.error("Google Identity not loaded");
-   }
- }, []);
- 
+  useEffect(() => {
+    if (window.google && window.google.accounts) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleGoogleLogin,
+      });
 
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleSignInDiv"),
+        {
+          theme: "outline",
+          size: "large",
+          shape: "pill",
+          text: "continue_with",
+          width: "250",
+        }
+      );
+    } else {
+      console.error("Google Identity not loaded");
+    }
+  }, []);
 
   return (
-  <Box
-    sx={{
-      position: "relative",
-      top: 0,
-      left: 0,
-      width: "100vw",
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-      py: 6,
-      overflowY: "auto",
-    }}
-  >
-    <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-      <Grid
-        container
-        spacing={4}
-        direction={{ xs: "column", md: "row" }}
-        alignItems="center"
-        justifyContent="space-between"
-        wrap="nowrap"
-      >
-        {/* Left Side - Written Content */}
-        <Grid item xs={12} md={6}>
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="pt-0 mt-0"
-            style={{ marginTop: 0,paddingTop: 0 }}
-          >
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
-              Unlock Insights with Excellytics
-            </h1>
-            <p className="text-white/85 mb-6 max-w-xl">
-              Upload, visualize, and analyze your Excel data in seconds. Intelligent
-              insights, beautiful charts, and powerful tools at your fingertips.
-            </p>
+    <Box
+      sx={{
+        position: "relative",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+        py: 6,
+        overflowY: "auto",
+      }}
+    >
+      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+        <Grid
+          container
+          spacing={4}
+          direction={{ xs: "column", md: "row" }}
+          alignItems="center"
+          justifyContent="space-between"
+          wrap="nowrap"
+        >
+          {/* Left Side - Written Content */}
+          <Grid item xs={12} md={6}>
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="pt-0 mt-0"
+              style={{ marginTop: -30, paddingTop: 0 }}
+            >
+              <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-6 leading-tight">
+                Unlock Insights with Excellytics
+              </h1>
+              <p className="text-white/85 mb-8 max-w-xl leading-relaxed">
+                Upload, visualize, and analyze your Excel data in seconds.
+                Intelligent insights, beautiful charts, and powerful tools at
+                your fingertips.
+              </p>
 
-            <FeatureItem
-              icon={BarChartIcon}
-              title="Interactive Charts"
-              description="Generate 2D and 3D charts from your uploaded Excel files."
-            />
-            <FeatureItem
-              icon={TableChartIcon}
-              title="Smart Data Parsing"
-              description="Advanced parsing to structure and analyze data seamlessly."
-            />
-            <FeatureItem
-              icon={SpeedIcon}
-              title="Fast Performance"
-              description="Optimized backend ensures smooth and fast processing."
-            />
-            <FeatureItem
-              icon={SecurityIcon}
-              title="Secure Access"
-              description="Your data is protected with end-to-end encryption and JWT auth."
-            />
-          </motion.div>
-        </Grid>
+              <FeatureItem
+                icon={BarChartIcon}
+                title="Interactive Charts"
+                description="Generate 2D and 3D charts from your uploaded Excel files."
+              />
+              <FeatureItem
+                icon={TableChartIcon}
+                title="Smart Data Parsing"
+                description="Advanced parsing to structure and analyze data seamlessly."
+              />
+              <FeatureItem
+                icon={SpeedIcon}
+                title="Fast Performance"
+                description="Optimized backend ensures smooth and fast processing."
+              />
+              <FeatureItem
+                icon={SecurityIcon}
+                title="Secure Access"
+                description="Your data is protected with end-to-end encryption and JWT auth."
+              />
+            </motion.div>
+          </Grid>
           {/* Right Side - Login Form */}
           <Grid item xs={12} md={6}>
             <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            style={{paddingTop: 25}}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              style={{ paddingTop: 40 }}
             >
               <Box
                 sx={{
@@ -339,7 +322,7 @@ const Login = () => {
                     component="h2"
                     variant="h5"
                     sx={{
-                      mb: 3,
+                      mb: 2,
                       color: "#4f46e5",
                       fontWeight: 500,
                       letterSpacing: "-0.5px",
@@ -397,6 +380,7 @@ const Login = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       sx={{
+                        mb: 1,
                         "& .MuiOutlinedInput-root": {
                           borderRadius: "12px",
                           backgroundColor: "rgba(255, 255, 255, 0.9)",
@@ -425,6 +409,7 @@ const Login = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       sx={{
+                        mb: 1,
                         "& .MuiOutlinedInput-root": {
                           borderRadius: "12px",
                           backgroundColor: "rgba(255, 255, 255, 0.9)",
@@ -448,30 +433,33 @@ const Login = () => {
                               edge="end"
                               sx={{ color: "#4f46e5" }}
                             >
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         ),
                       }}
                     />
 
-                      {/* forgot password */}
-                      <div className="text-right mt-2">
-  <a
-    href="/forgot-password"
-    className="text-sm text-indigo-600 hover:underline"
-  >
-    Forgot password?
-  </a>
-</div>
-
+                    {/* forgot password */}
+                    <div className="text-right mt-2 mb-1">
+                      <a
+                        href="/forgot-password"
+                        className="text-sm text-indigo-600 hover:underline"
+                      >
+                        Forgot password?
+                      </a>
+                    </div>
 
                     <Button
                       type="submit"
                       fullWidth
                       variant="contained"
                       sx={{
-                        mt: 3,
+                        mt: 2,
                         mb: 2,
                         height: 50,
                         fontSize: "1.1rem",
@@ -494,29 +482,36 @@ const Login = () => {
                       Sign In
                     </Button>
 
+                    {/* Divider with OR */}
+                    <Box sx={{ display: "flex", alignItems: "center", my: 2 }}>
+                      <Divider
+                        sx={{ flex: 1, height: 1, backgroundColor: "#ccc" }}
+                      />
+                      <Typography
+                        sx={{ mx: 2, color: "#888", fontWeight: 500 }}
+                      >
+                        or
+                      </Typography>
+                      <Divider
+                        sx={{ flex: 1, height: 1, backgroundColor: "#ccc" }}
+                      />
+                    </Box>
 
-                      {/* Divider with OR */}
-<Box sx={{ display: "flex", alignItems: "center", my: 1 }}>
-  <Divider sx={{ flex: 1, height: 1, backgroundColor: "#ccc" }} />
-  <Typography sx={{ mx: 2, color: "#888", fontWeight: 500 }}>or</Typography>
-  <Divider sx={{ flex: 1, height: 1, backgroundColor: "#ccc" }} />
-</Box>
-
-
-<Box
-  sx={{
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    m: 0,
-  }}
->
-  <div id="googleSignInDiv" style={{ margin: "1rem 0" }}></div>
-</Box>
-                    <Box sx={{ textAlign: "center",
-                      pt:1
-                     }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                        mb: 2,
+                      }}
+                    >
+                      <div
+                        id="googleSignInDiv"
+                        style={{ margin: "1rem 0" }}
+                      ></div>
+                    </Box>
+                    <Box sx={{ textAlign: "center", pt: 1 }}>
                       <Link
                         to="/register"
                         style={{
