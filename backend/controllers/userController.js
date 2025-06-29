@@ -47,7 +47,8 @@ const getUserActivities = async (req, res) => {
 // ✅ Update user profile
 const updateUserProfile = async (req, res) => {
   const userId = req.user.id;
-  const { username, email, currentPassword, newPassword, confirmPassword } = req.body;
+  const { username, email, currentPassword, newPassword, confirmPassword } =
+    req.body;
 
   // console.log("➡️ Incoming profile update body:", req.body);
   // console.log("➡️ Authenticated user ID:", userId);
@@ -70,7 +71,9 @@ const updateUserProfile = async (req, res) => {
     if (currentPassword || newPassword || confirmPassword) {
       if (!currentPassword || !newPassword || !confirmPassword) {
         // console.log("❗ Missing password fields");
-        return res.status(400).json({ message: "All password fields are required" });
+        return res
+          .status(400)
+          .json({ message: "All password fields are required" });
       }
 
       const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -78,7 +81,9 @@ const updateUserProfile = async (req, res) => {
 
       if (!isMatch) {
         // console.log("❌ Current password mismatch");
-        return res.status(401).json({ message: "Current password is incorrect" });
+        return res
+          .status(401)
+          .json({ message: "Current password is incorrect" });
       }
 
       if (newPassword !== confirmPassword) {
@@ -86,10 +91,12 @@ const updateUserProfile = async (req, res) => {
         return res.status(400).json({ message: "New passwords do not match" });
       }
 
-      user.password = newPassword;
+      // Hash the new password before saving
+      const saltRounds = 12;
+      user.password = await bcrypt.hash(newPassword, saltRounds);
       user.markModified("password");
 
-      // console.log("🧪 Password field set (plain):", user.password);
+      // console.log("🧪 Password field set (hashed):", user.password);
       // console.log("🧪 isModified(password):", user.isModified("password")); // ✅ should be true
     }
 
@@ -103,14 +110,11 @@ const updateUserProfile = async (req, res) => {
       username: updatedUser.username,
       email: updatedUser.email,
     });
-
   } catch (err) {
     console.error("❌ Error in updateUserProfile:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
 
 module.exports = {
   getUserStats,
