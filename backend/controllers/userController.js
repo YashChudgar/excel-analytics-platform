@@ -93,17 +93,13 @@ const updateUserProfile = async (req, res) => {
 
       // Hash the new password before saving
       const saltRounds = 12;
+
+      //user.password = newPassword; // 🔐 Let the pre-save hook hash this
       user.password = await bcrypt.hash(newPassword, saltRounds);
       user.markModified("password");
-
-      // console.log("🧪 Password field set (hashed):", user.password);
-      // console.log("🧪 isModified(password):", user.isModified("password")); // ✅ should be true
     }
 
-    // console.log("📣 Saving user...");
     const updatedUser = await user.save();
-    // console.log("✅ User saved");
-    // console.log("📦 Updated password hash:", updatedUser.password);
 
     res.status(200).json({
       id: updatedUser._id,
@@ -119,5 +115,5 @@ const updateUserProfile = async (req, res) => {
 module.exports = {
   getUserStats,
   getUserActivities,
-  updateUserProfile, // ✅ export this
+  updateUserProfile, 
 };
