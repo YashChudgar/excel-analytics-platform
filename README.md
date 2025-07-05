@@ -141,6 +141,25 @@ Powered by OpenAI or Gemini (via serverless function or backend endpoint)
 │   └── ...
 
 
+🔗 Live Demo
+🌐 Frontend: https://excel-analytics-platform-theta.vercel.app/
+🌐 Backend: https://excel-analytics-platform-backend-pozh.onrender.com/
+
+🧪 Try It Out
+Upload .xls/.xlsx files
+Select chart axes
+Generate 2D/3D charts
+AI insights 
+Admin/User dashboards
+
+🧪 Demo Login:
+Email: hello@gmail.com
+Password: 123@123
+
+📣 Deployment Details
+Frontend: Deployed on Vercel
+Backend: Deployed on Render
+
 
 🙌 Contributing
 
