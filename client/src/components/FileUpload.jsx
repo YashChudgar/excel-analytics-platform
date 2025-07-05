@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 import {
   Box,
   Button,
@@ -49,8 +49,8 @@ const FileUpload = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/upload",
+      const response = await axiosInstance.post(
+        "/upload",
         formData,
         {
           headers: {

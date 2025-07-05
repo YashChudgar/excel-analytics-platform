@@ -19,7 +19,7 @@ import { motion } from "framer-motion";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useSelector } from "react-redux";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 import DashboardLayout from "../components/DashboardLayout";
 
 const AdminDashboard = () => {
@@ -39,8 +39,8 @@ const AdminDashboard = () => {
     const fetchAdminData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          "http://localhost:5000/api/admin/dashboard",
+        const response = await axiosInstance.get(
+          "/admin/dashboard",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -68,7 +68,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/admin/users/${userId}`, {
+        await axiosInstance.delete(`/admin/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
