@@ -124,6 +124,24 @@ const Profile = () => {
       }
     }
 
+    const payload = {
+  username: formData.username,
+  email: formData.email,
+};
+
+if (
+  formData.currentPassword &&
+  formData.newPassword &&
+  formData.confirmPassword
+) {
+  payload.currentPassword = formData.currentPassword;
+  payload.newPassword = formData.newPassword;
+  payload.confirmPassword = formData.confirmPassword;
+}
+
+await dispatch(updateUser(payload)).unwrap();
+
+
     try {
       await dispatch(
         updateUser({
@@ -212,44 +230,6 @@ const Profile = () => {
     {user?.role || "User"}
   </span>
 </div>
-        {/* <Box
-          sx={{
-            background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-            borderRadius: 4,
-            p: 4,
-            mb: 4,
-            color: "white",
-            textAlign: "center",
-          }}
-        >
-          <Avatar
-            sx={{
-              width: 80,
-              height: 80,
-              mx: "auto",
-              mb: 2,
-              bgcolor: "rgba(255,255,255,0.2)",
-              fontSize: "2rem",
-            }}
-          >
-            {user?.username?.charAt(0)?.toUpperCase() || "U"}
-          </Avatar>
-          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-            {user?.username || "User"}
-          </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9 }}>
-            {user?.email || "user@example.com"}
-          </Typography>
-          <Chip
-            label={user?.role || "User"}
-            sx={{
-              mt: 2,
-              bgcolor: "rgba(255,255,255,0.2)",
-              color: "white",
-              fontWeight: "bold",
-            }}
-          />
-        </Box> */}
 
         {/* Stats Section */}
         <h3 className="text-2xl font-bold text-slate-800 mb-6">Your Analytics Overview</h3>
@@ -282,46 +262,6 @@ const Profile = () => {
   />
 </div>
 
-        {/* <Typography
-          variant="h5"
-          sx={{ fontWeight: "bold", mb: 3, color: "#1e293b" }}
-        >
-          Your Analytics Overview
-        </Typography> 
-         <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={4}>
-            <StatCard
-              icon={<CloudUploadIcon sx={{ fontSize: 40 }} />}
-              title="Total Files"
-              value={userStats?.totalFiles || 0}
-              color="#4f46e5"
-              loading={statsLoading}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <StatCard
-              icon={<AnalyticsIcon sx={{ fontSize: 40 }} />}
-              title="Total Analyses"
-              value={userStats?.totalAnalyses || 0}
-              color="#10b981"
-              loading={statsLoading}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <StatCard
-              icon={<ScheduleIcon sx={{ fontSize: 40 }} />}
-              title="Last Active"
-              value={
-                userStats?.lastActive
-                  ? format(new Date(userStats.lastActive), "MMM d")
-                  : "Today"
-              }
-              color="#f59e0b"
-              loading={statsLoading}
-            />
-          </Grid>
-        </Grid> */}
-
         {/* Error and Success Messages */}
         {(error || localError) && (
   <div className="mb-4 text-sm p-4 bg-red-100 border border-red-300 rounded text-red-800">
@@ -334,18 +274,6 @@ const Profile = () => {
     {success}
   </div>
 )}
-
-        {/* {(error || localError) && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {localError || error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity="success" sx={{ mb: 3 }}>
-            {success}
-          </Alert>
-        )} */}
 
         {/* Profile Form Section */}
 <div className="bg-white rounded-2xl shadow-md overflow-visible p-6">
@@ -496,237 +424,6 @@ const Profile = () => {
     </>
   )}
 </div>
-
-        {/* <Card
-          sx={{
-            background: "white",
-            borderRadius: 3,
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-            overflow: "visible",
-          }}
-        >
-          <CardContent sx={{ p: 4 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 3,
-              }}
-            >
-              <Typography
-                variant="h5"
-                sx={{ fontWeight: "bold", color: "#1e293b" }}
-              >
-                Profile Information
-              </Typography>
-              <Box sx={{ display: "flex", gap: 1 }}>
-                {!isEditing ? (
-                  <Button
-                    variant="contained"
-                    startIcon={<EditIcon />}
-                    onClick={() => setIsEditing(true)}
-                    sx={{
-                      background:
-                        "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-                      "&:hover": {
-                        background:
-                          "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
-                      },
-                    }}
-                  >
-                    Edit Profile
-                  </Button>
-                ) : (
-                  <>
-                    <Button
-                      variant="outlined"
-                      startIcon={<CancelIcon />}
-                      onClick={handleCancel}
-                      sx={{ borderColor: "#64748b", color: "#64748b" }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      startIcon={<SaveIcon />}
-                      onClick={handleSubmit}
-                      disabled={loading}
-                      sx={{
-                        background:
-                          "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                        "&:hover": {
-                          background:
-                            "linear-gradient(135deg, #059669 0%, #10b981 100%)",
-                        },
-                      }}
-                    >
-                      {loading ? (
-                        <CircularProgress size={20} color="inherit" />
-                      ) : (
-                        "Save Changes"
-                      )}
-                    </Button>
-                  </>
-                )}
-              </Box>
-            </Box>
-
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PersonIcon sx={{ color: "#64748b" }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon sx={{ color: "#64748b" }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-            </Grid>
-
-            {isEditing && (
-              <>
-                <Divider sx={{ my: 3 }} />
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: "bold", mb: 3, color: "#1e293b" }}
-                >
-                  🔐 Change Password
-                </Typography>
-
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={4}>
-                    <TextField
-                      fullWidth
-                      label="Current Password"
-                      name="currentPassword"
-                      type={showCurrentPassword ? "text" : "password"}
-                      value={formData.currentPassword}
-                      onChange={handleChange}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LockIcon sx={{ color: "#64748b" }} />
-                          </InputAdornment>
-                        ),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() =>
-                                setShowCurrentPassword(!showCurrentPassword)
-                              }
-                              edge="end"
-                            >
-                              {showCurrentPassword ? (
-                                <VisibilityOffIcon />
-                              ) : (
-                                <VisibilityIcon />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <TextField
-                      fullWidth
-                      label="New Password"
-                      name="newPassword"
-                      type={showNewPassword ? "text" : "password"}
-                      value={formData.newPassword}
-                      onChange={handleChange}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LockIcon sx={{ color: "#64748b" }} />
-                          </InputAdornment>
-                        ),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() =>
-                                setShowNewPassword(!showNewPassword)
-                              }
-                              edge="end"
-                            >
-                              {showNewPassword ? (
-                                <VisibilityOffIcon />
-                              ) : (
-                                <VisibilityIcon />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <TextField
-                      fullWidth
-                      label="Confirm New Password"
-                      name="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LockIcon sx={{ color: "#64748b" }} />
-                          </InputAdornment>
-                        ),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() =>
-                                setShowConfirmPassword(!showConfirmPassword)
-                              }
-                              edge="end"
-                            >
-                              {showConfirmPassword ? (
-                                <VisibilityOffIcon />
-                              ) : (
-                                <VisibilityIcon />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-              </>
-            )}
-          </CardContent>
-        </Card> */}
 
         {/* Refresh Button */}
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
