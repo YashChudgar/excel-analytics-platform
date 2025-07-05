@@ -93,8 +93,8 @@ const updateUserProfile = async (req, res) => {
 
       // Hash the new password before saving
       const saltRounds = 12;
-      user.password = newPassword; 
-
+      user.password = await bcrypt.hash(newPassword, saltRounds);
+      user.markModified("password");
 
       // console.log("🧪 Password field set (hashed):", user.password);
       // console.log("🧪 isModified(password):", user.isModified("password")); // ✅ should be true
