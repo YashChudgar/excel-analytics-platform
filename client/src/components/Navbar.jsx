@@ -379,46 +379,94 @@ if (!isVisiblePage) return null;
               </Box>
             </Box>
           ) : (
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <Button
-                variant="outlined"
-                onClick={() => navigate("/login")}
-                sx={{
-                  display: { xs: "none", sm: "block" },
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1,
-                  borderWidth: 2,
-                  fontWeight: 500,
-                  "&:hover": {
-                    borderWidth: 2,
-                  },
-                }}
-              >
-                Log In
-              </Button>
-              <Button
-                variant="contained"
-                onClick={() => navigate("/register")}
-                sx={{
-                  display: { xs: "none", sm: "block" },
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1,
-                  background:
-                    "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-                  fontWeight: 500,
-                  boxShadow: "0 4px 14px rgba(79, 70, 229, 0.25)",
-                  "&:hover": {
-                    background:
-                      "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
-                    boxShadow: "0 6px 20px rgba(79, 70, 229, 0.35)",
-                  },
-                }}
-              >
-                Register
-              </Button>
-            </Box>
+            <Box
+  sx={{
+    display: "flex",
+    gap: { xs: 1, sm: 2 },
+    flexDirection: { xs: "column", sm: "row" },
+    alignItems: "center",
+  }}
+>
+  <Button
+    variant="outlined"
+    onClick={() => navigate("/login")}
+    sx={{
+      width: { xs: "100%", sm: "auto" },
+      fontSize: { xs: "0.8rem", sm: "0.95rem" },
+      px: { xs: 2, sm: 3 },
+      py: { xs: 1, sm: 1 },
+      borderRadius: 2,
+      fontWeight: 500,
+      borderWidth: 2,
+      textTransform: "none",
+    }}
+  >
+    Log In
+  </Button>
+
+  <Button
+    variant="contained"
+    onClick={() => navigate("/register")}
+    sx={{
+      width: { xs: "100%", sm: "auto" },
+      fontSize: { xs: "0.8rem", sm: "0.95rem" },
+      px: { xs: 2, sm: 3 },
+      py: { xs: 1, sm: 1 },
+      borderRadius: 2,
+      fontWeight: 500,
+      background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+      boxShadow: "0 4px 14px rgba(79, 70, 229, 0.25)",
+      textTransform: "none",
+      "&:hover": {
+        background: "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
+        boxShadow: "0 6px 20px rgba(79, 70, 229, 0.35)",
+      },
+    }}
+  >
+    Register
+  </Button>
+</Box>
+
+            // <Box sx={{ display: "flex", gap: 2 }}>
+            //   <Button
+            //     variant="outlined"
+            //     onClick={() => navigate("/login")}
+            //     sx={{
+            //       display: "block",
+            //       borderRadius: 2,
+            //       px: 3,
+            //       py: 1,
+            //       borderWidth: 2,
+            //       fontWeight: 500,
+            //       "&:hover": {
+            //         borderWidth: 2,
+            //       },
+            //     }}
+            //   >
+            //     Log In
+            //   </Button>
+            //   <Button
+            //     variant="contained"
+            //     onClick={() => navigate("/register")}
+            //     sx={{
+            //       display: "block",
+            //       borderRadius: 2,
+            //       px: 3,
+            //       py: 1,
+            //       background:
+            //         "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+            //       fontWeight: 500,
+            //       boxShadow: "0 4px 14px rgba(79, 70, 229, 0.25)",
+            //       "&:hover": {
+            //         background:
+            //           "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
+            //         boxShadow: "0 6px 20px rgba(79, 70, 229, 0.35)",
+            //       },
+            //     }}
+            //   >
+            //     Register
+            //   </Button>
+            // </Box>
           )}
         </Toolbar>
       </Container>

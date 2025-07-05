@@ -166,24 +166,22 @@ const AdminDashboard = () => {
             </div>
 
             {/* Pie Chart */}
-            <div className="max-w-4xl mx-auto">
+            <div className="w-full max-w-4xl mx-auto px-4">
               <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
                 Active vs Inactive Users
               </h3>
-              <div className="bg-gray-50 rounded-2xl shadow-lg p-6">
-                <ResponsiveContainer width="100%" height={320}>
+              <div className="bg-gray-50 rounded-2xl shadow-lg sm:p-6">
+                <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
                       data={userDistributionData}
                       cx="50%"
                       cy="50%"
-                      outerRadius={100}
-                      innerRadius={50}
+                      outerRadius="80%"
+                      innerRadius="45%"
                       dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} (${(percent * 100).toFixed(0)}%)`
-                      }
-                      labelLine={true}
+                      label
+                      labelLine={window.innerWidth >= 768}
                     >
                       {userDistributionData.map((entry, index) => (
                         <Cell
@@ -194,11 +192,11 @@ const AdminDashboard = () => {
                     </Pie>
                     <Tooltip />
                     <Legend
-                      layout="vertical"
-                      verticalAlign="middle"
-                      align="right"
-                      iconType="circle"
-                    />
+      layout={window.innerWidth < 768 ? "horizontal" : "vertical"}
+      verticalAlign={window.innerWidth < 768 ? "bottom" : "middle"}
+      align={window.innerWidth < 768 ? "center" : "right"}
+      iconType="circle"
+    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>

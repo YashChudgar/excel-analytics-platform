@@ -184,7 +184,7 @@ const Login = () => {
               className="pt-0 mt-0"
               style={{ marginTop: -30, paddingTop: 0 }}
             >
-              <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-6 leading-tight">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-6 leading-tight pt-15">
                 Unlock Insights with Excellytics
               </h1>
               <p className="text-white/85 mb-8 max-w-xl leading-relaxed">

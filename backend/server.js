@@ -38,8 +38,18 @@ if (!MONGO_URI) {
 
 mongoose.set('strictQuery', false);
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error(err));
+  .then(() => {
+    if (process.env.NODE_ENV !== "production") {
+      console.log("MongoDB connected");
+    }
+  })
+  .catch(err => {
+    console.error("MongoDB connection error:", err); // keep this
+  });
+
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {};
+}
 
 app.use('/api/auth', authRoutes);
 app.use("/api", uploadRoutes);
@@ -57,4 +67,4 @@ app.use((err, req, res, next) => {
 
 app.get('/', (req, res) => res.send('API running...'));
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT);

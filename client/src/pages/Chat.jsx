@@ -41,6 +41,7 @@ const Chat = () => {
 
   return (
     <DashboardLayout>
+       <div className="mt-12">
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-pink-100 px-4 py-10 flex flex-col items-center">
         <motion.h1
           initial={{ opacity: 0, y: -30 }}
@@ -126,6 +127,7 @@ const Chat = () => {
             </motion.div>
           )}
         </motion.div>
+      </div>
       </div>
     </DashboardLayout>
   );

@@ -232,7 +232,7 @@ const ExcelAnalytics = () => {
   const chartRef = useRef(null);
   const chartContainerRef = useRef(null);
   useEffect(() => {
-    console.log("🧪 chartType changed:", chartType);
+    // console.log("🧪 chartType changed:", chartType);
   }, [chartType]);
 
   // Animated Camera Component
@@ -251,11 +251,11 @@ const ExcelAnalytics = () => {
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
-      console.log("File selected:", {
-        name: selectedFile.name,
-        type: selectedFile.type,
-        size: selectedFile.size,
-      });
+      // console.log("File selected:", {
+      //   name: selectedFile.name,
+      //   type: selectedFile.type,
+      //   size: selectedFile.size,
+      // });
 
       if (
         selectedFile.type ===
@@ -477,7 +477,7 @@ const ExcelAnalytics = () => {
           }
         )
         .then((response) => {
-          console.log("Analysis timestamp updated:", response.data);
+          // console.log("Analysis timestamp updated:", response.data);
         })
         .catch((error) => {
           console.error("Error updating analysis timestamp:", error);

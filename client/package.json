@@ -57,6 +57,7 @@
     "postcss": "^8.5.5",
     "postcss-preset-env": "^10.1.6",
     "tailwindcss": "^4.1.10",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-remove-console": "^2.2.0"
   }
 }

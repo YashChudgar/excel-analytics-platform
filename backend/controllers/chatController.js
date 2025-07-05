@@ -40,7 +40,7 @@ const handleChatMessage = async (req, res) => {
   const { fileId } = req.params;
   const requestId = crypto.randomUUID();
 
-  console.log(`📩 [${requestId}] Chat request for file ${fileId}: ${message?.slice(0, 30)}...`);
+  // console.log(`[${requestId}] Chat request for file ${fileId}: ${message?.slice(0, 30)}...`);
 
   try {
     if (!message) {
@@ -58,7 +58,7 @@ const handleChatMessage = async (req, res) => {
 
     const cacheKey = `${req.user._id}_${fileId}_${message}`;
     if (cache.has(cacheKey)) {
-      console.log(`⚡ [${requestId}] Responding from cache`);
+      // console.log(`[${requestId}] Responding from cache`);
       return res.json({ response: cache.get(cacheKey) });
     }
 
@@ -100,7 +100,7 @@ Respond clearly in Markdown with:
       file._id
     );
 
-    console.log(`✅ [${requestId}] Insight ready`);
+    // console.log(` [${requestId}] Insight ready`);
     return res.json({ response: reply });
   } catch (err) {
     console.error(`❌ [${requestId}] Server error:`, err);
