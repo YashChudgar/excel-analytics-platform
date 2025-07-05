@@ -192,7 +192,7 @@ const Landing = () => {
 
   return (
     <>
-      <div className="relative min-h-screen overflow-hidden flex items-center">
+      <div className="relative min-h-screen overflow-hidden flex items-center pt-20">
         {/* Animated Background - Same as Login Page */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-900">
           {/* Animated gradient overlay */}
