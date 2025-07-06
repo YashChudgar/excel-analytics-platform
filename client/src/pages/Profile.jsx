@@ -101,71 +101,62 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLocalError("");
+    setSuccess("");
 
+    // 🔒 Validate password fields if any are filled
+  const {
+    username,
+    email,
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  } = formData;
+  
     // Validate password fields if any are filled
-    if (
-      formData.currentPassword ||
-      formData.newPassword ||
-      formData.confirmPassword
-    ) {
-      if (
-        !formData.currentPassword ||
-        !formData.newPassword ||
-        !formData.confirmPassword
-      ) {
-        setLocalError(
-          "All password fields are required when changing password"
-        );
-        return;
-      }
-      if (formData.newPassword !== formData.confirmPassword) {
-        setLocalError("New passwords do not match");
-        return;
-      }
+    
+  if (currentPassword || newPassword || confirmPassword) {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setLocalError("All password fields are required when changing password");
+      return;
     }
+    if (newPassword !== confirmPassword) {
+      setLocalError("New passwords do not match");
+      return;
+    }
+  }
 
     const payload = {
-  username: formData.username,
-  email: formData.email,
-};
-
-if (
-  formData.currentPassword &&
-  formData.newPassword &&
-  formData.confirmPassword
-) {
-  payload.currentPassword = formData.currentPassword;
-  payload.newPassword = formData.newPassword;
-  payload.confirmPassword = formData.confirmPassword;
-}
-
-await dispatch(updateUser(payload)).unwrap();
-
-
-    try {
-      await dispatch(
-        updateUser({
-          username: formData.username,
-          email: formData.email,
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword,
-          confirmPassword: formData.confirmPassword,
-        })
-      ).unwrap();
-
-      setSuccess("Profile updated successfully!");
-      setIsEditing(false);
-      setFormData({
-        username: formData.username,
-        email: formData.email,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch (error) {
-      setLocalError(error || "Failed to update profile");
-    }
+    username,
+    email,
   };
+
+ if (currentPassword && newPassword && confirmPassword) {
+    payload.currentPassword = currentPassword;
+    payload.newPassword = newPassword;
+    payload.confirmPassword = confirmPassword;
+  }
+
+try {
+    const res = await dispatch(updateUser(payload)).unwrap();
+
+    setSuccess(res.message || "Profile updated successfully");
+    setIsEditing(false);
+    setFormData({
+      username,
+      email,
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  } catch (error) {
+    const msg =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to update profile";
+    setLocalError(msg);
+  }
+};
 
   const handleCancel = () => {
     setIsEditing(false);

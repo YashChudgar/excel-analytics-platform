@@ -54,60 +54,51 @@ const updateUserProfile = async (req, res) => {
     const user = await User.findById(userId).select("+password");
 
     if (!user) {
-      // console.log("❌ User not found in DB");
       return res.status(404).json({ message: "User not found" });
     }
-
-    // console.log("✅ Fetched user:", user);
 
     // Update username/email if provided
     if (username) user.username = username;
     if (email) user.email = email;
 
-    // Handle password change
+    // Handle password change if any password fields are present
     if (currentPassword || newPassword || confirmPassword) {
       if (!currentPassword || !newPassword || !confirmPassword) {
-        // console.log("❗ Missing password fields");
         return res
           .status(400)
           .json({ message: "All password fields are required" });
       }
 
       const isMatch = await bcrypt.compare(currentPassword, user.password);
-      // console.log("🔐 Password match result:", isMatch);
-
       if (!isMatch) {
-        // console.log("❌ Current password mismatch");
         return res
-          .status(401)
+          .status(400)
           .json({ message: "Current password is incorrect" });
       }
 
       if (newPassword !== confirmPassword) {
-        // console.log("❌ New passwords do not match");
         return res.status(400).json({ message: "New passwords do not match" });
       }
 
-      // Hash the new password before saving
-      const saltRounds = 12;
-
-      user.password = newPassword; // 🔐 Let the pre-save hook hash this
-      // user.password = await bcrypt.hash(newPassword, saltRounds);
-      // user.markModified("password");
+      // Set the new password — pre-save hook will hash it
+      user.password = newPassword;
     }
 
     const updatedUser = await user.save();
 
+    // ✅ Include a message in the success response
     res.status(200).json({
+      message: currentPassword ? "Password updated successfully" : "Profile updated successfully",
       id: updatedUser._id,
       username: updatedUser.username,
       email: updatedUser.email,
     });
   } catch (err) {
-    console.error("❌ Error in updateUserProfile:", err);
+    console.error("❌ Error in updateUserProfile:", err.stack || err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 module.exports = {
   getUserStats,
