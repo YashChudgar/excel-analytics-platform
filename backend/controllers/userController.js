@@ -50,9 +50,6 @@ const updateUserProfile = async (req, res) => {
   const { username, email, currentPassword, newPassword, confirmPassword } =
     req.body;
 
-  // console.log("➡️ Incoming profile update body:", req.body);
-  // console.log("➡️ Authenticated user ID:", userId);
-
   try {
     const user = await User.findById(userId).select("+password");
 
@@ -94,9 +91,9 @@ const updateUserProfile = async (req, res) => {
       // Hash the new password before saving
       const saltRounds = 12;
 
-      //user.password = newPassword; // 🔐 Let the pre-save hook hash this
-      user.password = await bcrypt.hash(newPassword, saltRounds);
-      user.markModified("password");
+      user.password = newPassword; // 🔐 Let the pre-save hook hash this
+      // user.password = await bcrypt.hash(newPassword, saltRounds);
+      // user.markModified("password");
     }
 
     const updatedUser = await user.save();
