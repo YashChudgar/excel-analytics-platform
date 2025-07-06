@@ -15,6 +15,7 @@ import {
   InputAdornment,
   IconButton,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import {
   Visibility,
@@ -55,11 +56,12 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
+    setLoading(true);
     try {
       // Dispatch the redux loginUser thunk and wait for result
       const resultAction = await dispatch(loginUser({ email, password }));
@@ -73,6 +75,8 @@ const Login = () => {
       }
     } catch (error) {
       setError(error.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -455,32 +459,43 @@ const Login = () => {
                     </div>
 
                     <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      sx={{
-                        mt: 2,
-                        mb: 2,
-                        height: 50,
-                        fontSize: "1.1rem",
-                        borderRadius: "12px",
-                        background:
-                          "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
-                        textTransform: "none",
-                        fontWeight: 600,
-                        letterSpacing: "0.5px",
-                        "&:hover": {
-                          background:
-                            "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
-                          boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
-                        },
-                      }}
-                      component={motion.button}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Sign In
-                    </Button>
+  type="submit"
+  fullWidth
+  variant="contained"
+  disabled={loading}
+  sx={{
+    mt: 2,
+    mb: 2,
+    height: 50,
+    fontSize: "1.1rem",
+    borderRadius: "12px",
+    background:
+      "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+    textTransform: "none",
+    fontWeight: 600,
+    letterSpacing: "0.5px",
+    "&:hover": {
+      background:
+        "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
+      boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
+    },
+    opacity: loading ? 0.7 : 1,
+    cursor: loading ? "not-allowed" : "pointer",
+  }}
+  component={motion.button}
+  whileHover={{ scale: loading ? 1 : 1.02 }}
+  whileTap={{ scale: loading ? 1 : 0.98 }}
+>
+  {loading ? (
+    <CircularProgress
+      size={24}
+      sx={{ color: "white" }}
+    />
+  ) : (
+    "Sign In"
+  )}
+</Button>
+
 
                     {/* Divider with OR */}
                     <Box sx={{ display: "flex", alignItems: "center", my: 2 }}>

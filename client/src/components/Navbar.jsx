@@ -382,21 +382,16 @@ if (!isVisiblePage) return null;
             <Box
   sx={{
     display: "flex",
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    gap: 2, // spacing between buttons
-    justifyContent: "center", // center buttons
-    flexShrink: 0,
-    flexGrow: 0,
-    width: "100%",
-    overflowX: "auto", // prevent overflow issues on tiny screens
-    // pr: { xs: 2, sm: 0 },
+    gap: { xs: 1, sm: 2 },
+    flexDirection: { xs: "column", sm: "row" },
+    alignItems: "center",
   }}
 >
   <Button
     variant="outlined"
     onClick={() => navigate("/login")}
     sx={{
+      width: { xs: "100%", sm: "auto" },
       fontSize: { xs: "0.8rem", sm: "0.95rem" },
       px: { xs: 2, sm: 3 },
       py: { xs: 1, sm: 1 },
@@ -404,7 +399,6 @@ if (!isVisiblePage) return null;
       fontWeight: 500,
       borderWidth: 2,
       textTransform: "none",
-      whiteSpace: "nowrap", // prevent breaking into new lines
     }}
   >
     Log In
@@ -414,6 +408,7 @@ if (!isVisiblePage) return null;
     variant="contained"
     onClick={() => navigate("/register")}
     sx={{
+      width: { xs: "100%", sm: "auto" },
       fontSize: { xs: "0.8rem", sm: "0.95rem" },
       px: { xs: 2, sm: 3 },
       py: { xs: 1, sm: 1 },
@@ -422,7 +417,6 @@ if (!isVisiblePage) return null;
       background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
       boxShadow: "0 4px 14px rgba(79, 70, 229, 0.25)",
       textTransform: "none",
-      whiteSpace: "nowrap",
       "&:hover": {
         background: "linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)",
         boxShadow: "0 6px 20px rgba(79, 70, 229, 0.35)",
@@ -432,7 +426,6 @@ if (!isVisiblePage) return null;
     Register
   </Button>
 </Box>
-
 
             // <Box sx={{ display: "flex", gap: 2 }}>
             //   <Button

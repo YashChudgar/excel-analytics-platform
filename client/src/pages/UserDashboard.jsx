@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axiosInstance from "../api/axiosInstance";
 import { format } from "date-fns";
-import DashboardLayout from "../components/DashboardLayout"; // adjust path if needed
+import DashboardLayout from "../components/DashboardLayout";
 
 import BarChartIcon from "@mui/icons-material/BarChart";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Dashboard = ({childern,hideNavbar=false}) => {
+const Dashboard = ({ children, hideNavbar = false }) => {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
 
@@ -24,8 +24,9 @@ const Dashboard = ({childern,hideNavbar=false}) => {
   const [activityLimit, setActivityLimit] = useState(5);
 
   useEffect(() => {
-    fetchActivities();
-    fetchFiles();
+    Promise.all([fetchActivities(), fetchFiles()]).finally(() =>
+      setLoading(false)
+    );
   }, [activityLimit]);
 
   const fetchActivities = async () => {
@@ -35,13 +36,7 @@ const Dashboard = ({childern,hideNavbar=false}) => {
         `/user/activities?limit=${activityLimit}`
       );
       const data = response.data;
-      if (Array.isArray(data)) {
-        setActivities(data);
-      } else if (Array.isArray(data.activities)) {
-        setActivities(data.activities);
-      } else {
-        setActivities([]);
-      }
+      setActivities(Array.isArray(data) ? data : data.activities || []);
     } catch (error) {
       console.error("Error fetching activities:", error);
       setError("Error fetching activities");
@@ -56,20 +51,13 @@ const Dashboard = ({childern,hideNavbar=false}) => {
     try {
       const response = await axiosInstance.get("/user/files");
       const data = response.data;
-      if (Array.isArray(data)) {
-        setFiles(data);
-      } else if (Array.isArray(data.files)) {
-        setFiles(data.files);
-      } else {
-        setFiles([]);
-      }
+      setFiles(Array.isArray(data) ? data : data.files || []);
     } catch (error) {
       console.error("Error fetching files:", error);
       setError("Error fetching files");
       setFiles([]);
     } finally {
       setFilesLoading(false);
-      setLoading(false);
     }
   };
 
@@ -99,43 +87,40 @@ const Dashboard = ({childern,hideNavbar=false}) => {
   const features = [
     {
       title: "Excel Analytics",
-      description:
-        "Upload and analyze your Excel files with advanced analytics tools",
-      icon: <TableChartIcon className="text-indigo-400 w-12 h-12 mb-2" />,
+      description: "Upload and analyze your Excel files",
+      icon: <TableChartIcon className="text-indigo-400 w-10 h-10 sm:w-12 sm:h-12 mb-2" />,
       onClick: () => navigate("/excel-analytics"),
     },
     {
       title: "Data Analysis",
-      description: "Analyze your Excel data with powerful tools",
+      description: "Analyze Excel data with powerful tools",
       icon: <AnalyticsIcon className="text-indigo-400 w-10 h-10" />,
       onClick: () => navigate("/excel-analytics"),
     },
     {
       title: "Visualizations",
-      description: "Create beautiful charts and graphs",
+      description: "Create interactive charts and graphs",
       icon: <BarChartIcon className="text-indigo-400 w-10 h-10" />,
       onClick: () => navigate("/excel-analytics"),
     },
   ];
 
   return (
-    <DashboardLayout hideNavbar={true}>
-      <main className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8 pt-0">
+    <DashboardLayout hideNavbar={hideNavbar}>
+      <main className="min-h-screen max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 pt-0">
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="bg-gradient-to-r from-indigo-500 to-indigo-700 text-white p-6 rounded-3xl shadow-2xl"
         >
-          <h2 className="text-3xl font-bold mb-2">Welcome {user?.username}!</h2>
-          <p className="text-lg">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2">Welcome {user?.username}!</h2>
+          <p className="text-base sm:text-lg">
             Here's an overview of your analytics and activities
           </p>
         </motion.div>
 
-        <h3 className="text-2xl font-semibold mt-10 mb-6 text-indigo-700">
-          Features
-        </h3>
+        <h3 className="text-2xl font-semibold mt-10 mb-6 text-indigo-700">Features</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
           {features.map((feature, index) => (
             <motion.div
@@ -143,29 +128,23 @@ const Dashboard = ({childern,hideNavbar=false}) => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.15 }}
-              className={`flex flex-col justify-between h-full p-6 bg-white border border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 ${
-                feature.onClick ? "cursor-pointer" : ""
-              }`}
+              className={`flex flex-col justify-between h-full p-6 bg-white border border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 ${feature.onClick ? "cursor-pointer" : ""}`}
               onClick={feature.onClick}
             >
               {feature.icon}
-              <h4 className="text-xl font-semibold mt-3 text-indigo-700">
-                {feature.title}
-              </h4>
-              <p className="text-sm text-gray-500 mt-1">
-                {feature.description}
-              </p>
+              <h4 className="text-xl font-semibold mt-3 text-indigo-700">{feature.title}</h4>
+              <p className="text-sm text-gray-500 mt-1">{feature.description}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* Activities Section */}
+        {/* Activities */}
         <section className="mt-14">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
             <h3 className="text-2xl font-semibold text-indigo-700">
               Recent Activities
             </h3>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={refreshData}
                 className="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
@@ -192,7 +171,7 @@ const Dashboard = ({childern,hideNavbar=false}) => {
             </div>
           )}
 
-          <div className="overflow-x-auto bg-white rounded-2xl shadow-lg">
+          <div className="min-h-[250px] overflow-x-auto bg-white rounded-2xl shadow-lg">
             {activitiesLoading ? (
               <div className="flex justify-center items-center p-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -250,7 +229,7 @@ const Dashboard = ({childern,hideNavbar=false}) => {
           </div>
         </section>
 
-        {/* Files Section */}
+        {/* Files */}
         <section className="mt-14">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
             <h3 className="text-2xl font-semibold text-indigo-700">
@@ -264,76 +243,84 @@ const Dashboard = ({childern,hideNavbar=false}) => {
             </button>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center p-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            </div>
-          ) : filesLoading ? (
-            <div className="flex justify-center items-center p-6 text-indigo-600 font-medium">
-              Loading files...
-            </div>
-          ) : files.length === 0 ? (
-            <div className="bg-gray-50 p-8 rounded-2xl text-center">
-              <p className="text-gray-500 text-lg">No files uploaded yet.</p>
-              <button
-                onClick={() => navigate("/excel-analytics")}
-                className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-              >
-                Upload Your First File
-              </button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto bg-white rounded-2xl shadow-lg">
-              <table className="w-full min-w-[800px] text-sm text-left">
-                <thead className="bg-indigo-100 text-indigo-700 font-semibold">
-                  <tr>
-                    <th className="p-4">File Name</th>
-                    <th className="p-4">Size</th>
-                    <th className="p-4">Upload Date</th>
-                    <th className="p-4">Last Analyzed</th>
-                    <th className="p-4">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {files.map((file) => (
-                    <tr key={file._id} className="hover:bg-gray-50 transition">
-                      <td className="p-4 font-medium">{file.originalName}</td>
-                      <td className="p-4">
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
-                      </td>
-                      <td className="p-4">
-                        {format(new Date(file.createdAt), "MMM d, yyyy h:mm a")}
-                      </td>
-                      <td className="p-4">
-                        {file.lastAnalyzed
-                          ? format(
-                              new Date(file.lastAnalyzed),
-                              "MMM d, yyyy h:mm a"
-                            )
-                          : "Never"}
-                      </td>
-                      <td className="p-4 flex gap-4">
-                        <button
-                          onClick={() => handleAnalyzeFile(file._id)}
-                          className="cursor-pointer text-blue-600 hover:text-blue-800 transition p-1 rounded hover:bg-blue-50"
-                          title="Analyze File"
-                        >
-                          <AnalyticsIcon fontSize="small" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFile(file._id)}
-                          className="cursor-pointer text-red-500 hover:text-red-700 transition p-1 rounded hover:bg-red-50"
-                          title="Delete File"
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </button>
-                      </td>
+          <div className="min-h-[250px]">
+            {loading ? (
+              <div className="flex justify-center items-center p-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              </div>
+            ) : filesLoading ? (
+              <div className="text-center p-6 text-indigo-600 font-medium">
+                Loading files...
+              </div>
+            ) : files.length === 0 ? (
+              <div className="bg-gray-50 p-8 rounded-2xl text-center">
+                <p className="text-gray-500 text-lg">No files uploaded yet.</p>
+                <button
+                  onClick={() => navigate("/excel-analytics")}
+                  className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                >
+                  Upload Your First File
+                </button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto bg-white rounded-2xl shadow-lg">
+                <table className="min-w-full text-sm text-left">
+                  <thead className="bg-indigo-100 text-indigo-700 font-semibold">
+                    <tr>
+                      <th className="p-4">File Name</th>
+                      <th className="p-4">Size</th>
+                      <th className="p-4">Upload Date</th>
+                      <th className="p-4">Last Analyzed</th>
+                      <th className="p-4">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody>
+                    {files.map((file) => (
+                      <tr
+                        key={file._id}
+                        className="hover:bg-gray-50 transition"
+                      >
+                        <td className="p-4 font-medium">{file.originalName}</td>
+                        <td className="p-4">
+                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </td>
+                        <td className="p-4">
+                          {format(
+                            new Date(file.createdAt),
+                            "MMM d, yyyy h:mm a"
+                          )}
+                        </td>
+                        <td className="p-4">
+                          {file.lastAnalyzed
+                            ? format(
+                                new Date(file.lastAnalyzed),
+                                "MMM d, yyyy h:mm a"
+                              )
+                            : "Never"}
+                        </td>
+                        <td className="p-4 flex flex-wrap gap-2">
+                          <button
+                            onClick={() => handleAnalyzeFile(file._id)}
+                            className="text-blue-600 hover:text-blue-800 transition p-1 rounded hover:bg-blue-50"
+                            title="Analyze File"
+                          >
+                            <AnalyticsIcon fontSize="small" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteFile(file._id)}
+                            className="text-red-500 hover:text-red-700 transition p-1 rounded hover:bg-red-50"
+                            title="Delete File"
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </section>
       </main>
     </DashboardLayout>
