@@ -123,7 +123,7 @@ const googleLoginHandler = async (req, res, mode) => {
         email,
         profilePic: picture,
         googleId: sub,
-        password: Math.random().toString(36).slice(-8), // dummy
+        password: Math.random().toString(36).slice(-8), 
       });
 
       const tokenJWT = generateToken(newUser._id);

@@ -9,7 +9,7 @@ const getUserFiles = async (req, res) => {
       createdAt: -1,
     });
 
-    res.json({ files }); // ✅ Wrap in object
+    res.json({ files }); //  Wrap in object
   } catch (error) {
     res.status(500).json({ error: "Error fetching files" });
   }

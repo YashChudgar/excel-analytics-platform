@@ -6,7 +6,7 @@ const getUserActivities = async (req, res) => {
     const limit = parseInt(req.query.limit) || 5;
     const activities = await UserActivity.find({ user: req.user._id })
       .sort({ createdAt: -1 })
-      .populate("file", "originalName") // ✅ field is now "file"
+      .populate("file", "originalName") // field is now "file"
       .limit(limit);
 
     res.json(activities);
@@ -22,13 +22,13 @@ const createActivity = async (userId, type, description, file = null) => {
     const activity = new UserActivity({
       user: userId,
       type,
-      description, // ✅ MATCHES your schema
-      file,        // ✅ renamed from fileId → file
+      description, 
+      file,        
     });
     await activity.save();
     return activity;
   } catch (error) {
-    console.error("❌ Error creating activity:", error);
+    console.error("Error creating activity:", error);
   }
 };
 

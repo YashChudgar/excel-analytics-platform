@@ -44,7 +44,7 @@ const getUserActivities = async (req, res) => {
   }
 };
 
-// ✅ Update user profile
+// Update user profile
 const updateUserProfile = async (req, res) => {
   const userId = req.user.id;
   const { username, email, currentPassword, newPassword, confirmPassword } =
@@ -86,7 +86,7 @@ const updateUserProfile = async (req, res) => {
 
     const updatedUser = await user.save();
 
-    // ✅ Include a message in the success response
+    // Include a message in the success response
     res.status(200).json({
       message: currentPassword ? "Password updated successfully" : "Profile updated successfully",
       id: updatedUser._id,

@@ -37,7 +37,6 @@ const generateAIInsights = async (req, res) => {
     const data = await readExcelFile(file.cloudinaryUrl);
     const summary = formatDataForMock(data);
 
-    // ✅ MOCK INSIGHTS (replace this later with real AI)
     const insights = `
 ### 📊 Mock Insights
 

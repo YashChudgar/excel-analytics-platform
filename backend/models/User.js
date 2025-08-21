@@ -20,30 +20,30 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 6,
-    select: false, // ⬅️ this hides password by default
+    select: false, // this hides password by default
   },
   role: {
     type: String,
     enum: ["user", "admin"],
     default: "user",
   },
-  // 🔐 Password Reset Fields
+  //  Password Reset Fields
 }, { timestamps: true });
 
 
 
 userSchema.pre("save", async function (next) {
-  // console.log("📌 Inside pre-save hook");
+  // console.log(" Inside pre-save hook");
 
   if (!this.isModified("password")) {
-    // console.log("⚠️ Password not modified — skipping hash");
+    // console.log(" Password not modified — skipping hash");
     return next();
   }
 
-  // console.log("🔐 Password IS modified, hashing now...");
+  // console.log(" Password IS modified, hashing now...");
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  // console.log("✅ Password hashed:", this.password);
+  // console.log(" Password hashed:", this.password);
 
   next();
 });
